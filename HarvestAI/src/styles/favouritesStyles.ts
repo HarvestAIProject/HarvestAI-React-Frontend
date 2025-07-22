@@ -10,7 +10,7 @@ const favouritesStyles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#7BA890',
     paddingTop: 60,
-    paddingBottom: 12,
+    paddingBottom: 16,
     paddingHorizontal: 8,
     borderRadius: 12,
   },
