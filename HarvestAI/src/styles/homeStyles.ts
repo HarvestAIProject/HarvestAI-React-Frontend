@@ -6,11 +6,12 @@ const homeStyles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: 'InriaSerif-Bold',
     marginTop: 16,
     marginBottom: 8,
     color: '#000',
+    width: '60%',
   },
   placeholder: {
     fontSize: 16,

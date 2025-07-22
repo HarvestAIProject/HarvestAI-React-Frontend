@@ -8,6 +8,7 @@ const layoutStyles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 100,
+    flex: 1,
   },
 
 });
