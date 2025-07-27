@@ -26,7 +26,7 @@ const homeStyles = StyleSheet.create({
   },
   seeAll: {
     fontSize: 14,
-    color: '#6c9a83',
+    color: '#7BA890',
     fontWeight: '600',
   },
   dishSection: {

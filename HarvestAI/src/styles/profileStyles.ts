@@ -103,18 +103,34 @@ const profileStyles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  inputLabel: {
+    alignSelf: 'flex-start',
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
+    marginLeft: 4,
+    fontWeight: 'bold',
+  },
+
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 6,
     padding: 10,
-    marginBottom: 16,
+  },
+
+  charCount: {
+    alignSelf: 'flex-end',
+    fontSize: 10,
+    color: '#888',
+    marginTop: 4,
   },
 
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 8,
+    marginTop: 16,
   },
 
   saveButton: {

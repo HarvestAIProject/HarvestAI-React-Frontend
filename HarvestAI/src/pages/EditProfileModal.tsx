@@ -93,6 +93,7 @@ const EditProfileModal = ({ visible, currentName, currentBio, currentImage, onSa
           </View>
 
           {/* Name Input */}
+          <Text style={profileStyles.inputLabel}>Name</Text>
           <TextInput
             style={profileStyles.input}
             value={name}
@@ -101,13 +102,16 @@ const EditProfileModal = ({ visible, currentName, currentBio, currentImage, onSa
           />
 
           {/* Bio Input */}
+          <Text style={[profileStyles.inputLabel, { marginTop: 12 }]}>Bio</Text>
           <TextInput
             style={[profileStyles.input, { height: 80 }]}
             value={bio}
             onChangeText={setBio}
             placeholder="Enter bio"
             multiline
+            maxLength={100}
           />
+          <Text style={profileStyles.charCount}>{bio.length}/100</Text>
 
           <View style={profileStyles.buttonRow}>
             <TouchableOpacity style={profileStyles.saveButton} onPress={() => onSave(name, bio, imageUri)}>

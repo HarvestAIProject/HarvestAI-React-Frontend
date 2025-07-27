@@ -14,12 +14,11 @@ import {
   toggleCameraFacing,
   createPinchGesture
 } from '../utils/CameraUtils';
+import ResultsOverlay from '../components/ResultsOverlay';
+import { ResultItem } from '../types/ResultItem';
+import { useNavigation } from '@react-navigation/native';
 
-type Props = {
-  onClose: () => void;
-};
-
-const CameraScreen = ({ onClose }: Props) => {
+const CameraScreen = () => {
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>('back');
   const [isCameraReady, setIsCameraReady] = useState(false);
@@ -31,12 +30,25 @@ const CameraScreen = ({ onClose }: Props) => {
   const cameraRef = useRef<CameraView>(null);
   const pinchStartZoom = useSharedValue(0);
 
+  const [results, setResults] = useState<ResultItem[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [resultsOverlayClosed, setResultsOverlayClosed] = useState(false);
+
+  const navigation = useNavigation();
+
   useEffect(() => {
     const interval = setInterval(() => {
       setZoom(zoomShared.value);
     }, 50);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (resultsOverlayClosed) {
+      setPreviewUri(null);
+      setResultsOverlayClosed(false); // reset flag
+    }
+  }, [resultsOverlayClosed]);
 
   const pinchGesture = createPinchGesture(zoomShared, pinchStartZoom);
 
@@ -55,33 +67,40 @@ const CameraScreen = ({ onClose }: Props) => {
   return (
     <View style={cameraScreenStyles.container}>
       {isProcessing && <ProcessingOverlay />}
+
       {previewUri ? (
         <View style={cameraScreenStyles.previewContainer}>
           <Image source={{ uri: previewUri }} style={cameraScreenStyles.previewImage} />
 
-          <TouchableOpacity
-            onPress={() => setPreviewUri(null)}
-            style={cameraScreenStyles.closeButton}
-          >
-            <Ionicons name="close" size={28} color="white" />
-          </TouchableOpacity>
+          {!isProcessing && !showResults && (
+            <>
+              <TouchableOpacity
+                onPress={() => setPreviewUri(null)}
+                style={cameraScreenStyles.closeButton}
+              >
+                <Ionicons name="close" size={28} color="white" />
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={async () => {
-              setIsProcessing(true);
-              try {
-                await sendImageToModel(previewUri);
-              } catch (e) {
-                console.error(e);
-              } finally {
-                setIsProcessing(false);
-                onClose();
-              }
-            }}
-            style={cameraScreenStyles.usePhotoButton}
-          >
-            <Ionicons name="arrow-forward" size={24} color="white" />
-          </TouchableOpacity>
+              <TouchableOpacity
+                onPress={async () => {
+                  setIsProcessing(true);
+                  try {
+                    const modelResults = await sendImageToModel(previewUri);
+                    setResults(modelResults);
+                  } catch (e) {
+                    console.error(e);
+                    setResults([]);
+                  } finally {
+                    setShowResults(true);
+                    setIsProcessing(false);
+                  }
+                }}
+                style={cameraScreenStyles.usePhotoButton}
+              >
+                <Ionicons name="arrow-forward" size={24} color="white" />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       ) : (
         <>
@@ -99,53 +118,67 @@ const CameraScreen = ({ onClose }: Props) => {
             </View>
           </GestureDetector>
 
-          <TouchableOpacity style={cameraScreenStyles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={28} color="white" />
-          </TouchableOpacity>
+          {!isProcessing && !showResults && (
+            <>
+              <TouchableOpacity style={cameraScreenStyles.closeButton} onPress={() => navigation.goBack()}>
+                <Ionicons name="close" size={28} color="white" />
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            style={cameraScreenStyles.flashButton}
-            onPress={() => toggleFlash(setFlash)}
-          >
-            <Ionicons
-              name={
-                flash === 'off'
-                  ? 'flash-off-outline'
-                  : flash === 'on'
-                  ? 'flash-outline'
-                  : 'flash'
-              }
-              size={28}
-              color="white"
-            />
-          </TouchableOpacity>
+              <TouchableOpacity
+                style={cameraScreenStyles.flashButton}
+                onPress={() => toggleFlash(setFlash)}
+              >
+                <Ionicons
+                  name={
+                    flash === 'off'
+                      ? 'flash-off-outline'
+                      : flash === 'on'
+                      ? 'flash-outline'
+                      : 'flash'
+                  }
+                  size={28}
+                  color="white"
+                />
+              </TouchableOpacity>
 
-          <View style={cameraScreenStyles.bottomOverlay}>
-            <TouchableOpacity
-              style={cameraScreenStyles.galleryButton}
-              onPress={() => handlePickImage(setPreviewUri)}
-            >
-              <Ionicons name="image-outline" size={26} color="white" />
-            </TouchableOpacity>
+              <View style={cameraScreenStyles.bottomOverlay}>
+                <TouchableOpacity
+                  style={cameraScreenStyles.galleryButton}
+                  onPress={() => handlePickImage(setPreviewUri)}
+                >
+                  <Ionicons name="image-outline" size={26} color="white" />
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={cameraScreenStyles.snapButton}
-              onPress={() =>
-                handleSnap(cameraRef, isCameraReady, setPreviewUri)
-              }
-            />
+                <TouchableOpacity
+                  style={cameraScreenStyles.snapButton}
+                  onPress={() => handleSnap(cameraRef, isCameraReady, setPreviewUri)}
+                />
 
-            <TouchableOpacity
-              style={cameraScreenStyles.flipButton}
-              onPress={() => toggleCameraFacing(setFacing)}
-            >
-              <Ionicons name="camera-reverse-outline" size={28} color="white" />
-            </TouchableOpacity>
-          </View>
+                <TouchableOpacity
+                  style={cameraScreenStyles.flipButton}
+                  onPress={() => toggleCameraFacing(setFacing)}
+                >
+                  <Ionicons name="camera-reverse-outline" size={28} color="white" />
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
         </>
       )}
+
+      <ResultsOverlay
+        results={results}
+        visible={showResults}
+        onClose={() => {
+          setShowResults(false); // triggers sheet to close
+        }}
+        onCloseComplete={() => {
+          setResultsOverlayClosed(true); // will trigger useEffect
+        }}
+      />
     </View>
   );
 };
 
 export default CameraScreen;
+

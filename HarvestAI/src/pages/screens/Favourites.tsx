@@ -1,16 +1,15 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import favouritesStyles from '../../styles/favouritesStyles';
+import { useNavigation } from '@react-navigation/native';
 
-type Props = {
-  onBack: () => void;
-};
 
-const Favourites = ({ onBack }: Props) => {
+const Favourites = () => {
+  const navigation = useNavigation();
   return (
     <View style={favouritesStyles.container}>
       <View style={favouritesStyles.topBar}>
-        <TouchableOpacity style={favouritesStyles.backButton} onPress={onBack}>
+        <TouchableOpacity style={favouritesStyles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={favouritesStyles.title}>Favourites</Text>
