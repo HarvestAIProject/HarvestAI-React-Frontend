@@ -12,7 +12,112 @@ const recipePageStyles = StyleSheet.create({
     position: 'absolute',
     top: 70,
     left: 20,
-  }
+  },
+  headerContainer: {
+    marginTop: 140,
+    paddingHorizontal: 24,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  titleWrapper: {
+    flex: 1,
+    marginRight: 12,
+    backgroundColor: '#7ba890d8',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  iconGroup: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  iconWrapper: {
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  iconLabel: {
+    fontSize: 10,
+    color: 'white',
+    marginTop: 2,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: 'white',
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  description: {
+    color: 'white',
+    fontSize: 12,
+    marginBottom: 16,
+  },
+  contentCard: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginTop: 20,
+    flex: 1,
+  },
+  tabRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    marginHorizontal: 16,
+    marginTop: 16,
+  },
+  tabItem: {
+    paddingVertical: 8,
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: 'black',
+  },
+  tabText: {
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  cardGrid: {
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+  },
+  card: {
+    backgroundColor: '#7BA890',
+    borderRadius: 8,
+    overflow: 'hidden',
+    margin: 8,
+    flex: 1,
+    minWidth: '45%',
+  },
+  cardImage: {
+    height: 100,
+    width: '100%',
+  },
+  cardTextContainer: {
+    padding: 8,
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    color: '#f5f5f5',
+    marginBottom: 8,
+  },
 });
 
 export default recipePageStyles;

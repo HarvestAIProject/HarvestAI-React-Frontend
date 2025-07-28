@@ -41,7 +41,7 @@ const bottomNavStyles = StyleSheet.create({
   },
   cameraIcon: {
     fontSize: 32,
-    color: '#000',
+    color: 'white',
   },
   cameraSpacer: {
     width: 70,

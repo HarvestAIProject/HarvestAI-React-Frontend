@@ -14,7 +14,7 @@ type Props = {
 };
 
 const Profile = ({ userName, bio, profileImage, setUserName, setBio, setProfileImage }: Props) => {
-  const [activeTab, setActiveTab] = useState<'saved' | 'favourites' | 'posts'>('saved');
+  const [activeTab, setActiveTab] = useState<'saved' | 'posts'>('saved');
   const [showEditModal, setShowEditModal] = useState(false);
   const getIconColor = (tab: string) => (activeTab === tab ? '#6c9a83' : '#999');
   const getTextStyle = (tab: string) => [
@@ -66,16 +66,6 @@ const Profile = ({ userName, bio, profileImage, setUserName, setBio, setProfileI
             />
             <Text style={getTextStyle('saved')}>Saved</Text>
             <View style={[profileStyles.indicator, activeTab !== 'saved' && profileStyles.inactiveIndicator]} />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setActiveTab('favourites')} style={profileStyles.tabItem}>
-            <Ionicons
-              name={activeTab === 'favourites' ? 'heart' : 'heart-outline'}
-              size={20}
-              color={getIconColor('favourites')}
-            />
-            <Text style={getTextStyle('favourites')}>Favourites</Text>
-            <View style={[profileStyles.indicator, activeTab !== 'favourites' && profileStyles.inactiveIndicator]} />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => setActiveTab('posts')} style={profileStyles.tabItem}>

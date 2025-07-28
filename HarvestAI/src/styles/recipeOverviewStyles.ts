@@ -63,6 +63,7 @@ const recipeOverviewStyles = StyleSheet.create({
       padding: 6,
       borderRadius: 4,
       marginRight: 8,
+      color: 'white',
     },
     descriptionContainer: {
       maxHeight: 150,
@@ -82,6 +83,7 @@ const recipeOverviewStyles = StyleSheet.create({
     viewButtonText: {
       textAlign: 'center',
       fontWeight: 'bold',
+      color: 'white',
     },
     caloriesContainer: {
       borderColor: '#aaa',

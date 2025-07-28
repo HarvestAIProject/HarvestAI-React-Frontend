@@ -18,7 +18,7 @@ const topBarStyles = StyleSheet.create({
   greetingText: {
     fontSize: 24,
     fontFamily: 'InriaSerif-Bold',
-    color: '#000',
+    color: 'white',
   },
   heartButton: {
     padding: 8,
