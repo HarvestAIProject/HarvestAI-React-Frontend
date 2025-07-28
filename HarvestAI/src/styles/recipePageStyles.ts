@@ -22,11 +22,10 @@ const recipePageStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-
   titleWrapper: {
     flex: 1,
     marginRight: 12,
-    backgroundColor: '#7ba890d8',
+    backgroundColor: '#7ba890ee',
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
@@ -64,7 +63,7 @@ const recipePageStyles = StyleSheet.create({
     marginBottom: 16,
   },
   contentCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f9f9f9',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     marginTop: 20,
@@ -94,12 +93,14 @@ const recipePageStyles = StyleSheet.create({
     paddingBottom: 32,
   },
   card: {
-    backgroundColor: '#7BA890',
+    backgroundColor: '#fff',
     borderRadius: 8,
     overflow: 'hidden',
     margin: 8,
     flex: 1,
     minWidth: '45%',
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   cardImage: {
     height: 100,
@@ -111,12 +112,31 @@ const recipePageStyles = StyleSheet.create({
   cardTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'black',
   },
   cardSubtitle: {
     fontSize: 12,
-    color: '#f5f5f5',
+    color: '#555',
     marginBottom: 8,
+  },
+  placeholderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  placeholderText: {
+    color: '#999',
+    fontSize: 14,
+    fontStyle: 'italic',
+  },
+  textContentContainer: {
+    padding: 16,
+  },
+  textContent: {
+    color: '#333',
+    fontSize: 14,
+    lineHeight: 22,
   },
 });
 

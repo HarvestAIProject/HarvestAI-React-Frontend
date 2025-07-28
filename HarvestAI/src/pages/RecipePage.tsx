@@ -28,6 +28,66 @@ const RecipePage =() => {
     { id: '4', name: 'Sesame Oil', type: 'Condiment', image: 'https://example.com/sesameoil.jpg' },
   ];
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'Ingredients':
+        return (
+          <FlatList
+            data={dummyIngredients}
+            keyExtractor={item => item.id}
+            numColumns={2}
+            contentContainerStyle={recipePageStyles.cardGrid}
+            renderItem={({ item }) => (
+              <View style={recipePageStyles.card}>
+                <ImageBackground
+                  source={{ uri: item.image }}
+                  style={recipePageStyles.cardImage}
+                  imageStyle={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
+                />
+                <View style={recipePageStyles.cardTextContainer}>
+                  <Text style={recipePageStyles.cardTitle}>{item.name}</Text>
+                  <Text style={recipePageStyles.cardSubtitle}>{item.type}</Text>
+                </View>
+              </View>
+            )}
+          />
+        );
+
+      case 'Preparation':
+        return (
+          <View style={recipePageStyles.textContentContainer}>
+            <Text style={recipePageStyles.textContent}>
+              1. Wash and slice the vegetables.{"\n"}
+              2. Prepare the bibimbap sauce.{"\n"}
+              3. Sauté each vegetable individually.{"\n"}
+              4. Fry the egg sunny-side-up.{"\n"}
+              5. Assemble the bowl and top with sauce.
+            </Text>
+          </View>
+        );
+
+      case 'Nutrition':
+        return (
+          <View style={recipePageStyles.textContentContainer}>
+            <Text style={recipePageStyles.textContent}>
+              • Calories: 360 kcal{"\n"}
+              • Carbs: 45g{"\n"}
+              • Protein: 12g{"\n"}
+              • Fat: 15g{"\n"}
+              • Fiber: 6g
+            </Text>
+          </View>
+        );
+
+      default:
+        return (
+          <View style={recipePageStyles.placeholderContainer}>
+            <Text style={recipePageStyles.placeholderText}>No content available.</Text>
+          </View>
+        );
+    }
+  };
+
   return (
     <ImageBackground
       source={{ uri: item.image }}
@@ -92,26 +152,7 @@ const RecipePage =() => {
           ))}
         </View>
 
-        {/* Ingredients List */}
-        <FlatList
-          data={dummyIngredients}
-          keyExtractor={item => item.id}
-          numColumns={2}
-          contentContainerStyle={recipePageStyles.cardGrid}
-          renderItem={({ item }) => (
-            <View style={recipePageStyles.card}>
-              <ImageBackground
-                source={{ uri: item.image }}
-                style={recipePageStyles.cardImage}
-                imageStyle={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
-              />
-              <View style={recipePageStyles.cardTextContainer}>
-                <Text style={recipePageStyles.cardTitle}>{item.name}</Text>
-                <Text style={recipePageStyles.cardSubtitle}>{item.type}</Text>
-              </View>
-            </View>
-          )}
-        />
+        {renderTabContent()}
       </View>
     </ImageBackground>
     
