@@ -7,6 +7,7 @@ import RecipeOverviewScreen from '../pages/RecipeOverviewScreen';
 import RecipePage from '../pages/RecipePage';
 import MainLayout from '../layout/MainLayout';
 import SearchScreen from '../pages/SearchScreen';
+import CategoriesScreen from '../pages/CategoriesScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -18,6 +19,7 @@ const AppNavigator = () => (
     <Stack.Screen name="Favourites" component={Favourites} />
     <Stack.Screen name="RecipeOverview" component={RecipeOverviewScreen} />
     <Stack.Screen name="RecipePage" component={RecipePage} />
+    <Stack.Screen name="Categories" component={CategoriesScreen} />
   </Stack.Navigator>
 );
 

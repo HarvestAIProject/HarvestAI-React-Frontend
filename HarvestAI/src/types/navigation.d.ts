@@ -5,4 +5,5 @@ export type RootStackParamList = {
   RecipeOverview: { item: ResultItem };
   RecipePage: { item: ResultItem };
   Search: undefined;
+  Categories: undefined;
 };

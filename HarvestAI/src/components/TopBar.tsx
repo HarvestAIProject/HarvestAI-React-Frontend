@@ -34,7 +34,7 @@ const TopBar = ({ activeTab, userName, onFavouritesPress }: Props) => {
         onPress={() => navigation.navigate('Search')}
       >
         <FontAwesome name="search" size={18} color="#6b7280" />
-        <Text style={topBarStyles.searchPlaceholder}>Search for recipes & ingredients</Text>
+        <Text style={topBarStyles.searchPlaceholder}>Search recipes</Text>
       </TouchableOpacity>
     </View>
   );

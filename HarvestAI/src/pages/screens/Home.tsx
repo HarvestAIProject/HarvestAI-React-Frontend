@@ -1,10 +1,14 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../types/navigation';
 import homeStyles from '../../styles/homeStyles';
 
 const Home = () => {
 
   const [activeMeal, setActiveMeal] = useState<'breakfast' | 'lunch' | 'dinner'>('lunch');
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const dishesByMeal = {
     breakfast: [],
@@ -15,11 +19,13 @@ const Home = () => {
   const categories = [];
 
   const handleSeeAllCategories = () => {
-
+    navigation.navigate('Categories');
   };
 
   const renderMealTab = (meal: 'breakfast' | 'lunch' | 'dinner') => {
+
     const isActive = activeMeal === meal;
+
     return (
       <TouchableOpacity
         key={meal}

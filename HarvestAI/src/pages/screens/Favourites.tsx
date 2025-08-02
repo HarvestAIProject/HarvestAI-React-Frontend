@@ -10,7 +10,7 @@ const Favourites = () => {
     <View style={favouritesStyles.container}>
       <View style={favouritesStyles.topBar}>
         <TouchableOpacity style={favouritesStyles.backButton} onPress={() => navigation.goBack()}>
-          <MaterialIcons name="arrow-back-ios" size={28} color="white" />
+          <MaterialIcons name="arrow-back-ios" size={28} color="black" />
         </TouchableOpacity>
         <Text style={favouritesStyles.title}>Favourites</Text>
       </View>

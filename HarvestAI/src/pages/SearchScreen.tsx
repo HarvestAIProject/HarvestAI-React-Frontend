@@ -18,9 +18,9 @@ const SearchScreen = () => {
     if (!query.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8080/search?query=${query}`);
+      const res = await fetch(`http://172.20.10.4:8080/search?query=${query}`);
       const data = await res.json();
-      setResults(data.results || []); // adjust if API response structure differs
+      setResults(data.results || data);
     } catch (error) {
       console.error('Search failed:', error);
     }
@@ -48,7 +48,7 @@ const SearchScreen = () => {
         <FontAwesome name="search" size={18} color="#6b7280" />
         <TextInput
           style={searchStyles.searchInput}
-          placeholder="Search recipes & ingredients"
+          placeholder="Search recipes"
           value={query}
           onChangeText={setQuery}
           autoFocus
@@ -63,7 +63,10 @@ const SearchScreen = () => {
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={searchStyles.resultList}
           renderItem={({ item }) => (
-            <TouchableOpacity style={searchStyles.resultCard}>
+            <TouchableOpacity
+              style={searchStyles.resultCard}
+              onPress={() => navigation.navigate('RecipeOverview', { item })}
+            >
               <Text style={searchStyles.resultTitle}>{item.title}</Text>
               {/* Optionally add distance, rating, image, etc. */}
             </TouchableOpacity>

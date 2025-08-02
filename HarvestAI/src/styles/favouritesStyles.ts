@@ -8,21 +8,19 @@ const favouritesStyles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#7BA890',
     paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 8,
-    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e5e5',
+    backgroundColor: '#fff',
   },
   backButton: {
     padding: 8,
-    marginRight: 12,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
     fontFamily: 'InriaSerif-Bold',
-    color: 'white',
   },
   content: {
     flex: 1,
