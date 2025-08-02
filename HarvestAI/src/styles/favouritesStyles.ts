@@ -22,7 +22,7 @@ const favouritesStyles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     fontFamily: 'InriaSerif-Bold',
-    color: '#000',
+    color: 'white',
   },
   content: {
     flex: 1,

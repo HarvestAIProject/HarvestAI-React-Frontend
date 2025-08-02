@@ -4,4 +4,5 @@ export type RootStackParamList = {
   Favourites: undefined;
   RecipeOverview: { item: ResultItem };
   RecipePage: { item: ResultItem };
+  Search: undefined;
 };

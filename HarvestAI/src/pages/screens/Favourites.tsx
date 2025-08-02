@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import favouritesStyles from '../../styles/favouritesStyles';
 import { useNavigation } from '@react-navigation/native';
 
@@ -10,7 +10,7 @@ const Favourites = () => {
     <View style={favouritesStyles.container}>
       <View style={favouritesStyles.topBar}>
         <TouchableOpacity style={favouritesStyles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <MaterialIcons name="arrow-back-ios" size={28} color="white" />
         </TouchableOpacity>
         <Text style={favouritesStyles.title}>Favourites</Text>
       </View>

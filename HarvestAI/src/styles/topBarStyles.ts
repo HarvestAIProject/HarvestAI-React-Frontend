@@ -22,6 +22,11 @@ const topBarStyles = StyleSheet.create({
   },
   heartButton: {
     padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 1,
   },
   searchBar: {
     flexDirection: 'row',
@@ -31,10 +36,10 @@ const topBarStyles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 12,
   },
-  searchInput: {
-    marginLeft: 8,
-    flex: 1,
+  searchPlaceholder: {
+    color: '#6b7280',
     fontSize: 16,
+    marginLeft: 8,
   },
 });
 

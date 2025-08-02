@@ -13,7 +13,7 @@ import layoutStyles from '../styles/layoutStyles';
 
 
 const MainLayout = () => {
-   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState<'Home' | 'Discover' | 'Shop' | 'You'>('Home');
   const [userName, setUserName] = useState('User');
   const [bio, setBio] = useState('Lover of noodles, spice & all things nice 🍜');

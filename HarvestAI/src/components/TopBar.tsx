@@ -1,5 +1,8 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../types/navigation';
 import topBarStyles from '../styles/topBarStyles';
 
 type Props = {
@@ -12,25 +15,27 @@ const TopBar = ({ activeTab, userName, onFavouritesPress }: Props) => {
 
   if (activeTab === 'You') return null;
 
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   return (
     <View style={topBarStyles.container}>
       {activeTab === 'Home' && (
         <View style={topBarStyles.headerRow}>
           <Text style={topBarStyles.greetingText}>What’s Cooking,{'\n'}{userName}</Text>
           <TouchableOpacity style={topBarStyles.heartButton} onPress={onFavouritesPress}>
-            <FontAwesome name="heart" size={24} color="black" />
+            <FontAwesome name="heart" size={24} color="white" />
           </TouchableOpacity>
         </View>
       )}
 
-      <View style={topBarStyles.searchBar}>
+      <TouchableOpacity
+        style={topBarStyles.searchBar}
+        activeOpacity={1}
+        onPress={() => navigation.navigate('Search')}
+      >
         <FontAwesome name="search" size={18} color="#6b7280" />
-        <TextInput
-          style={topBarStyles.searchInput}
-          placeholder="Search for recipes & channels"
-          placeholderTextColor="#6b7280"
-        />
-      </View>
+        <Text style={topBarStyles.searchPlaceholder}>Search for recipes & ingredients</Text>
+      </TouchableOpacity>
     </View>
   );
 };

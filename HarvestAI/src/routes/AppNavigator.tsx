@@ -6,12 +6,14 @@ import Favourites from '../pages/screens/Favourites';
 import RecipeOverviewScreen from '../pages/RecipeOverviewScreen';
 import RecipePage from '../pages/RecipePage';
 import MainLayout from '../layout/MainLayout';
+import SearchScreen from '../pages/SearchScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Main" component={MainLayout} />
+    <Stack.Screen name="Search" component={SearchScreen} />
     <Stack.Screen name="Camera" component={CameraScreen} />
     <Stack.Screen name="Favourites" component={Favourites} />
     <Stack.Screen name="RecipeOverview" component={RecipeOverviewScreen} />
