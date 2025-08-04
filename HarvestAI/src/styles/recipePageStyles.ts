@@ -97,7 +97,6 @@ const recipePageStyles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
     margin: 8,
-    flex: 1,
     minWidth: '45%',
     borderWidth: 1,
     borderColor: '#ddd',
@@ -137,6 +136,36 @@ const recipePageStyles = StyleSheet.create({
     color: '#333',
     fontSize: 14,
     lineHeight: 22,
+  },
+  textContentTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333',
+  },
+
+  stepItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+
+  stepNumber: {
+    fontWeight: 'bold',
+    marginRight: 8,
+    color: '#6c9a83',
+  },
+
+  stepText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#444',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
   },
 });
 

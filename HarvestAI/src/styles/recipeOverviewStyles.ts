@@ -56,7 +56,6 @@ const recipeOverviewStyles = StyleSheet.create({
     },
     tagsRow: {
       flexDirection: 'row',
-      marginBottom: 8,
     },
     tag: {
       backgroundColor: '#7BA890',
@@ -67,12 +66,18 @@ const recipeOverviewStyles = StyleSheet.create({
     },
     descriptionContainer: {
       maxHeight: 150,
-      marginVertical: 8,
+      marginVertical: 12,
     },
     description: {
       color: '#444',
       fontSize: 14,
       lineHeight: 18,
+    },
+    placeholder: {
+      fontSize: 16,
+      fontFamily: 'InriaSerif-Italic',
+      color: '#888',
+      marginBottom: 16,
     },
     viewButton: {
       backgroundColor: '#7BA890',

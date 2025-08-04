@@ -30,7 +30,73 @@ const homeStyles = StyleSheet.create({
     fontWeight: '600',
   },
   dishSection: {
-    minHeight: 180,
+    marginTop: 12,
+  },
+  dishCard: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginRight: 16,
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 250,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  dishRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  cardImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+
+  cardInfo: {
+    flex: 1,
+    justifyContent: 'flex-start',
+  },
+
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+    color: '#000',
+  },
+
+  cardDivider: {
+    height: 1,
+    backgroundColor: '#a0aec0',
+    width: '60%',
+    marginVertical: 4,
+  },
+
+  cardLink: {
+    color: '#7BA890',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  indicatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 16,
+  },
+  indicatorDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#e5e7eb',
+    marginHorizontal: 5,
+  },
+  activeDot: {
+    backgroundColor: '#7BA890',
+    width: 20,
   },
   categorySection: {
     flex:1,

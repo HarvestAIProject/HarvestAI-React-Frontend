@@ -1,5 +1,5 @@
 // RecipeOverviewScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
@@ -13,7 +13,78 @@ const RecipeOverviewScreen = () => {
 
   const [liked, setLiked] = useState(false);
 
+  const [nutrition, setNutrition] = useState<any>(null);
+  const [summary, setSummary] = useState<string>('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [score, setScore] = useState<number | null>(null);
+
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const res = await fetch(`http://172.20.10.4:8080/info?id=${item.id}`);
+        const data = await res.json();
+        setTags([
+          ...(data.dishTypes || []),
+          ...(data.cuisines || []),
+        ]);
+      } catch (e) {
+        console.error("Failed to fetch tags", e);
+      }
+    };
+    fetchTags();
+  }, []);
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const [nutRes, sumRes, infoRes] = await Promise.all([
+          fetch(`http://172.20.10.4:8080/nutrition?id=${item.id}`),
+          fetch(`http://172.20.10.4:8080/summary?id=${item.id}`),
+          fetch(`http://172.20.10.4:8080/info?id=${item.id}`),
+        ]);
+        const nutData = await nutRes.json();
+        const sumData = await sumRes.json();
+        const infoData = await infoRes.json();
+
+        setNutrition(nutData);
+        setSummary(sumData.summary); // Comes in HTML form
+        setScore(infoData.spoonacularScore);
+      } catch (err) {
+        console.error('Failed to fetch recipe details:', err);
+      }
+    };
+
+    fetchDetails();
+  }, []);
+
+  const renderStars = () => {
+    if (score === null) return null;
+    const starCount = Math.round(score / 20); // spoonacularScore out of 100
+    return (
+      <>
+        {[...Array(5)].map((_, i) => (
+          <MaterialIcons
+            key={i}
+            name={i < starCount ? 'star' : 'star-border'}
+            size={18}
+            color="gold"
+          />
+        ))}
+      </>
+    );
+  };
+  
+  const renderScoreText = () => {
+    if (score === null) return null;
+    const starCount = Math.round(score / 20); // 100 max → 5 stars
+    return (
+      <Text style={recipeOverviewStyles.likesText}>
+        {starCount}/5 Rating
+      </Text>
+    );
+  };
 
   return (
     <ImageBackground
@@ -54,26 +125,35 @@ const RecipeOverviewScreen = () => {
 
           {/* Rating */}
           <View style={recipeOverviewStyles.rowCenter}>
-            {[...Array(5)].map((_, index) => (
-              <MaterialIcons key={index} name="star" size={18} color="gold" />
-            ))}
-            <Text style={recipeOverviewStyles.likesText}>{item.likes} people liked this</Text>
+            {renderStars()}
+            {renderScoreText()}
           </View>
 
           {/* Tags */}
-          <View style={recipeOverviewStyles.tagsRow}>
-            <Text style={recipeOverviewStyles.tag}>Korean</Text>
-            <Text style={recipeOverviewStyles.tag}>Healthy</Text>
-          </View>
+          <ScrollView 
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={recipeOverviewStyles.tagsRow}>
+            {tags.length > 0 && (
+              <View style={recipeOverviewStyles.tagsRow}>
+                {tags.map((tag, idx) => (
+                  <Text key={idx} style={recipeOverviewStyles.tag}>{tag}</Text>
+                ))}
+              </View>
+            )}
+          </ScrollView>
 
           {/* Description */}
           <ScrollView style={recipeOverviewStyles.descriptionContainer}>
-            <Text style={recipeOverviewStyles.description}>
-              Bibimbap is one of the most well known Korean dishes. A rice bowl topped with all sorts
-              of seasoned sautéed vegetables, marinated meat (usually beef), a fried egg sunny side
-              up, finished with a sprinkle of sesame and generous dollop of a sweet-spicy-savoury
-              Bibimbap sauce.
-            </Text>
+            {summary ? (
+              <ScrollView style={recipeOverviewStyles.descriptionContainer}>
+                <Text style={recipeOverviewStyles.description}>
+                  {summary.replace(/<\/?[^>]+(>|$)/g, '')} {/* Strip HTML tags */}
+                </Text>
+              </ScrollView>
+            ) : (
+              <Text style={recipeOverviewStyles.placeholder}>Loading description...</Text>
+            )}
           </ScrollView>
 
           {/* Buttons */}
@@ -85,7 +165,9 @@ const RecipeOverviewScreen = () => {
           </TouchableOpacity>
 
           <View style={recipeOverviewStyles.caloriesContainer}>
-            <Text style={recipeOverviewStyles.caloriesContainerText}>360 Calories</Text>
+            <Text style={recipeOverviewStyles.caloriesContainerText}>
+              {nutrition?.calories || '...'} Calories
+            </Text>
           </View>
 
           {/* Share */}
