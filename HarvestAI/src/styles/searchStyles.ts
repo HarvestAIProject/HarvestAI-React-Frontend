@@ -12,17 +12,18 @@ const searchStyles = StyleSheet.create({
   },
   searchBar: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#f3f4f6',
     borderRadius: 8,
-    padding: 10,
-    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     marginBottom: 16,
   },
   searchInput: {
     marginLeft: 8,
-    flex: 1,
     fontSize: 16,
-    color: '#111827',
+    color: 'black',
+    paddingVertical: 0,
   },
   loader: {
     marginTop: 20,

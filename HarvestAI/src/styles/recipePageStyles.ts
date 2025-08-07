@@ -57,17 +57,21 @@ const recipePageStyles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 8,
   },
+  ratingText: {
+    color: 'white',
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  descriptionContainer: {
+    marginTop: 8,
+    marginBottom: 12,
+    maxHeight: '40%',
+    overflow: 'hidden',
+  },
   description: {
     color: 'white',
     fontSize: 12,
     marginBottom: 16,
-  },
-  contentCard: {
-    backgroundColor: '#f9f9f9',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: 20,
-    flex: 1,
   },
   tabRow: {
     flexDirection: 'row',
@@ -97,7 +101,7 @@ const recipePageStyles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
     margin: 8,
-    minWidth: '45%',
+    width: '45%',
     borderWidth: 1,
     borderColor: '#ddd',
   },
@@ -137,19 +141,11 @@ const recipePageStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
   },
-  textContentTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333',
-  },
-
   stepItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginVertical: 12,
   },
-
   stepNumber: {
     fontWeight: 'bold',
     marginRight: 8,

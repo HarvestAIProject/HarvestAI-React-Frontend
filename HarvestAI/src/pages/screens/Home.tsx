@@ -4,8 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/navigation';
 import { ResultItem } from '../../types/ResultItem';
-
+import { CategoryItem } from '../../types/CategoryItem';
 import homeStyles from '../../styles/homeStyles';
+import {
+  fetchCategories as fetchCategoriesAPI,
+  fetchPopularRecipes as fetchPopularRecipesAPI,
+} from '../../api/recipeApi';
 
 const Home = () => {
 
@@ -22,7 +26,11 @@ const Home = () => {
     dinner: [],
   });
 
-  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadingMeals, setLoadingMeals] = useState<{ [key in 'breakfast' | 'lunch' | 'dinner']?: boolean }>({});
+
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
@@ -33,18 +41,14 @@ const Home = () => {
     });
   };
 
-  const categories = [];
-
   const handleSeeAllCategories = () => {
     navigation.navigate('Categories');
   };
 
   const fetchDishesByMeal = async (meal: 'breakfast' | 'lunch' | 'dinner') => {
-    setLoading(true);
+    setLoadingMeals(prev => ({ ...prev, [meal]: true }));
     try {
-      const res = await fetch(`http://172.20.10.4:8080/popular?meal=${meal}`);
-      const data = await res.json();
-      
+      const data = await fetchPopularRecipesAPI(meal);
       setDishesByMeal((prev) => ({
         ...prev,
         [meal]: data.results || data,
@@ -52,8 +56,26 @@ const Home = () => {
     } catch (err) {
       console.error(`Failed to fetch ${meal} recipes`, err);
     }
-    setLoading(false);
+    setLoadingMeals(prev => ({ ...prev, [meal]: false }));
   };
+
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const data = await fetchCategoriesAPI();
+
+      const parsed: CategoryItem[] = data.slice(0, 3).map((item: any) => ({
+        name: item.name,
+        image: item.image,
+      }));
+
+      setCategories(parsed);
+    } catch (err) {
+      console.error('Failed to fetch categories', err);
+    }
+    setLoadingCategories(false);
+  };
+
 
   useEffect(() => {
     if (dishesByMeal[activeMeal].length === 0) {
@@ -61,6 +83,9 @@ const Home = () => {
     }
   }, [activeMeal]);
 
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const renderMealTab = (meal: 'breakfast' | 'lunch' | 'dinner') => {
 
@@ -88,7 +113,7 @@ const Home = () => {
   };
 
   return (
-    <ScrollView style={homeStyles.container}>
+    <View style={homeStyles.container}>
 
       {/* Meal Tabs */}
       <View style={homeStyles.mealTabs}>
@@ -96,75 +121,90 @@ const Home = () => {
         {renderMealTab('lunch')}
         {renderMealTab('dinner')}
       </View>
-
-      {/* Popular Dishes Section */}
-      <Text style={homeStyles.sectionTitle}>POPULAR DISHES OF THE WEEK</Text>
-      <View style={homeStyles.dishSection}>
-        {loading ? (
-          <Text style={homeStyles.placeholder}>Loading...</Text>
-        ) : dishesByMeal[activeMeal].length === 0 ? (
-          <Text style={homeStyles.placeholder}>No {activeMeal} dishes found</Text>
-        ) : (
-          <ScrollView
-            ref={scrollRef}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            scrollEventThrottle={16}
-            onScroll={(event) => {
-              const offsetX = event.nativeEvent.contentOffset.x;
-              const index = Math.round(offsetX / 266); // 266 is your card width
-              setActiveIndex(index);
-            }}
-          >
-            {dishesByMeal[activeMeal].map((dish) => (
+      <ScrollView>
+        {/* Popular Dishes Section */}
+        <Text style={homeStyles.sectionTitle}>POPULAR DISHES OF THE WEEK</Text>
+        <View style={homeStyles.dishSection}>
+          {loadingMeals[activeMeal] ? (
+            <Text style={homeStyles.placeholder}>Loading...</Text>
+          ) : dishesByMeal[activeMeal].length === 0 ? (
+            <Text style={homeStyles.placeholder}>No {activeMeal} dishes found</Text>
+          ) : (
+            <ScrollView
+              ref={scrollRef}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              scrollEventThrottle={16}
+              onScroll={(event) => {
+                const offsetX = event.nativeEvent.contentOffset.x;
+                const index = Math.round(offsetX / 266);
+                setActiveIndex(index);
+              }}
+            >
+              {dishesByMeal[activeMeal].map((dish) => (
+                <TouchableOpacity
+                  key={dish.id}
+                  style={homeStyles.dishCard}
+                  onPress={() => navigation.navigate('RecipeOverview', { item: dish })}
+                >
+                  <View style={homeStyles.dishRow}>
+                    <Image source={{ uri: dish.image }} style={homeStyles.cardImage} />
+                    <View style={homeStyles.cardInfo}>
+                      <Text style={homeStyles.cardTitle} numberOfLines={2}>{dish.title}</Text>
+                      <View style={homeStyles.cardDivider} />
+                      <Text style={homeStyles.cardLink}>Recipe</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
+          <View style={homeStyles.indicatorContainer}>
+            {dishesByMeal[activeMeal].map((_, i) => (
               <TouchableOpacity
-                key={dish.id}
-                style={homeStyles.dishCard}
-                onPress={() => navigation.navigate('RecipeOverview', { item: dish })}
+                key={i}
+                onPress={() => handleDotPress(i)}
+                style={[
+                  homeStyles.indicatorDot,
+                  i === activeIndex && homeStyles.activeDot
+                ]}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/* Category Section */}
+        <View style={homeStyles.categoryHeader}>
+          <Text style={homeStyles.sectionTitle}>CATEGORIES</Text>
+          <TouchableOpacity onPress={handleSeeAllCategories}>
+            <Text style={homeStyles.seeAll}>See All</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={homeStyles.categorySection}>
+          {loadingCategories ? (
+            <Text style={homeStyles.placeholder}>Loading...</Text>
+          ) : categories.length === 0 ? (
+            <Text style={homeStyles.placeholder}>No categories found</Text>
+          ) : (
+            categories.map((cat, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={homeStyles.categoryButton}
+                // onPress={() => navigation.navigate('CategoryRecipes', { category: cat.name })}
               >
-                <View style={homeStyles.dishRow}>
-                  <Image source={{ uri: dish.image }} style={homeStyles.cardImage} />
+                <View style={homeStyles.categoryRow}>
+                  <Image source={{ uri: cat.image }} style={homeStyles.categoryCardImage} resizeMode="cover" />
                   <View style={homeStyles.cardInfo}>
-                    <Text style={homeStyles.cardTitle} numberOfLines={2}>{dish.title}</Text>
-                    <View style={homeStyles.cardDivider} />
-                    <Text style={homeStyles.cardLink}>Recipe</Text>
+                    <Text style={homeStyles.categoryText}>{cat.name}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
-        )}
-        <View style={homeStyles.indicatorContainer}>
-          {dishesByMeal[activeMeal].map((_, i) => (
-            <TouchableOpacity
-              key={i}
-              onPress={() => handleDotPress(i)}
-              style={[
-                homeStyles.indicatorDot,
-                i === activeIndex && homeStyles.activeDot
-              ]}
-            />
-          ))}
+            ))
+          )}
         </View>
-      </View>
-
-      {/* Category Section */}
-      <View style={homeStyles.categoryHeader}>
-        <Text style={homeStyles.sectionTitle}>CATEGORIES</Text>
-        <TouchableOpacity onPress={handleSeeAllCategories}>
-          <Text style={homeStyles.seeAll}>See All</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={homeStyles.categorySection}>
-        {categories.length === 0 ? (
-          <Text style={homeStyles.placeholder}>No categories found</Text>
-        ) : (
-          // Render actual categories here
-          <View>{/* Your category list */}</View>
-        )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

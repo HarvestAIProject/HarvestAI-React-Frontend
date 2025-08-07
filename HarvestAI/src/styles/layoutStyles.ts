@@ -6,8 +6,7 @@ const layoutStyles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     justifyContent: 'space-between',
   },
-  scrollContent: {
-    paddingBottom: 100,
+  content: {
     flex: 1,
   },
 

@@ -100,6 +100,7 @@ const recipeOverviewStyles = StyleSheet.create({
     caloriesContainerText: {
       textAlign: 'center',
       color: '#333',
+      fontWeight: 'bold',
     },
     iconButton: {
       alignItems: 'center',

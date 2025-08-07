@@ -19,6 +19,7 @@
     "jsx": "react-native"
   },
   "include": [
+    "env.d.ts",
     "src",
     "App.tsx",
     "index.ts"

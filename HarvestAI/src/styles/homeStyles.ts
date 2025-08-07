@@ -4,6 +4,7 @@ const homeStyles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     backgroundColor: '#f0f0f0',
+    flex: 1,
   },
   sectionTitle: {
     fontSize: 20,
@@ -28,6 +29,40 @@ const homeStyles = StyleSheet.create({
     fontSize: 14,
     color: '#7BA890',
     fontWeight: '600',
+  },
+  categorySection: {
+    flex: 1,
+    gap: 10,
+    marginTop: 12,
+  },
+  categoryButton: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  categoryCardImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+  categoryText: {
+    fontFamily: 'InriaSerif-Regular',
+    fontSize: 18,
+    color: '#000',
   },
   dishSection: {
     marginTop: 12,
@@ -97,9 +132,6 @@ const homeStyles = StyleSheet.create({
   activeDot: {
     backgroundColor: '#7BA890',
     width: 20,
-  },
-  categorySection: {
-    flex:1,
   },
   mealTabs: {
     flexDirection: 'row',

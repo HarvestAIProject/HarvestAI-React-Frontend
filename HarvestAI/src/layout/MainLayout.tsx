@@ -47,10 +47,10 @@ const MainLayout = () => {
         onFavouritesPress={() => navigation.navigate('Favourites')}
       />
 
-      {/* Scrollable content for the current active tab */}
-      <ScrollView contentContainerStyle={layoutStyles.scrollContent}>
+      {/* Content for the current active tab */}
+      <View style={layoutStyles.content}>
         {renderContent()}
-      </ScrollView>
+      </View>
 
       {/* BottomNav with camera + tab switching */}
       <BottomNav

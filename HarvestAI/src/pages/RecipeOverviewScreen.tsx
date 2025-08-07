@@ -5,7 +5,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
-import recipeOverviewStyles from '../styles/recipeOverviewStyles'; 
+import recipeOverviewStyles from '../styles/recipeOverviewStyles';
+import {
+  fetchRecipeInfo,
+  fetchRecipeNutrition,
+  fetchRecipeSummary,
+} from '../api/recipeApi';
 
 const RecipeOverviewScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'RecipeOverview'>>();
@@ -23,8 +28,7 @@ const RecipeOverviewScreen = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const res = await fetch(`http://172.20.10.4:8080/info?id=${item.id}`);
-        const data = await res.json();
+        const data = await fetchRecipeInfo(item.id);
         setTags([
           ...(data.dishTypes || []),
           ...(data.cuisines || []),
@@ -39,17 +43,14 @@ const RecipeOverviewScreen = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const [nutRes, sumRes, infoRes] = await Promise.all([
-          fetch(`http://172.20.10.4:8080/nutrition?id=${item.id}`),
-          fetch(`http://172.20.10.4:8080/summary?id=${item.id}`),
-          fetch(`http://172.20.10.4:8080/info?id=${item.id}`),
+        const [nutData, sumData, infoData] = await Promise.all([
+          fetchRecipeNutrition(item.id),
+          fetchRecipeSummary(item.id),
+          fetchRecipeInfo(item.id),
         ]);
-        const nutData = await nutRes.json();
-        const sumData = await sumRes.json();
-        const infoData = await infoRes.json();
 
         setNutrition(nutData);
-        setSummary(sumData.summary); // Comes in HTML form
+        setSummary(sumData.summary);
         setScore(infoData.spoonacularScore);
       } catch (err) {
         console.error('Failed to fetch recipe details:', err);
@@ -159,7 +160,7 @@ const RecipeOverviewScreen = () => {
           {/* Buttons */}
           <TouchableOpacity
             style={recipeOverviewStyles.viewButton}
-            onPress={() => navigation.navigate('RecipePage', { item })}
+            onPress={() => navigation.navigate('RecipePage', { item, score })}
           >
             <Text style={recipeOverviewStyles.viewButtonText}>View Recipe Book</Text>
           </TouchableOpacity>

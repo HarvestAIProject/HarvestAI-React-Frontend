@@ -6,6 +6,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import searchStyles from '../styles/searchStyles';
 import { ResultItem } from '../types/ResultItem';
+import { searchRecipes } from '../api/recipeApi';
+
 
 const SearchScreen = () => {
   const [query, setQuery] = useState('');
@@ -18,8 +20,7 @@ const SearchScreen = () => {
     if (!query.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch(`http://172.20.10.4:8080/search?query=${query}`);
-      const data = await res.json();
+      const data = await searchRecipes(query);
       setResults(data.results || data);
     } catch (error) {
       console.error('Search failed:', error);
@@ -46,13 +47,20 @@ const SearchScreen = () => {
 
       <View style={searchStyles.searchBar}>
         <FontAwesome name="search" size={18} color="#6b7280" />
+
         <TextInput
-          style={searchStyles.searchInput}
+          style={[searchStyles.searchInput, { flex: 1 }]}
           placeholder="Search recipes"
           value={query}
           onChangeText={setQuery}
           autoFocus
         />
+
+        {query.length > 0 && (
+          <TouchableOpacity onPress={() => setQuery('')}>
+            <FontAwesome name="times-circle" size={18} color="#6b7280" style={{ marginLeft: 8 }} />
+          </TouchableOpacity>
+        )}
       </View>
 
       {loading ? (
@@ -68,7 +76,6 @@ const SearchScreen = () => {
               onPress={() => navigation.navigate('RecipeOverview', { item })}
             >
               <Text style={searchStyles.resultTitle}>{item.title}</Text>
-              {/* Optionally add distance, rating, image, etc. */}
             </TouchableOpacity>
           )}
         />

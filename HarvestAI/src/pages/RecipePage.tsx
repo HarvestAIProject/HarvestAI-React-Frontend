@@ -1,34 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
+  ScrollView,
   Text,
   TouchableOpacity,
   ImageBackground,
-  FlatList,
 } from 'react-native';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
+import BottomSheet, {
+  BottomSheetFlatList,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 import { RootStackParamList } from '../types/navigation';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import recipePageStyles from '../styles/recipePageStyles';
+import { fetchRecipeInfo } from '../api/recipeApi';
 
 const TABS = ['Ingredients', 'Preparation', 'Nutrition'];
 
-const RecipePage =() => {
+const RecipePage = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'RecipePage'>>();
-  const { item } = route.params;
+  const { item, score } = route.params;
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState('Ingredients');
-
   const [info, setInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const snapPoints = useMemo(() => ['30%', '85%'], []);
 
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const res = await fetch(`http://172.20.10.4:8080/info?id=${item.id}`);
-        const data = await res.json();
+        const data = await fetchRecipeInfo(item.id);
         setInfo(data);
       } catch (err) {
         console.error('Failed to fetch recipe info', err);
@@ -39,74 +43,63 @@ const RecipePage =() => {
     fetchInfo();
   }, []);
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'Ingredients':
-        return (
-          <FlatList
-            data={info?.extendedIngredients || []}
-            keyExtractor={item => item.id}
-            numColumns={2}
-            contentContainerStyle={recipePageStyles.cardGrid}
-            renderItem={({ item }) => (
-              <View style={recipePageStyles.card}>
-                <ImageBackground
-                  source={{ uri: `https://spoonacular.com/cdn/ingredients_250x250/${item.image}` }}
-                  style={recipePageStyles.cardImage}
-                  imageStyle={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
-                />
-                <View style={recipePageStyles.cardTextContainer}>
-                  <Text style={recipePageStyles.cardTitle}>{item.name}</Text>
-                  <Text style={recipePageStyles.cardSubtitle}>{item.aisle}</Text>
-                </View>
-              </View>
-            )}
-          />
-        );
-
-        case 'Preparation':
-          const steps: string[] =
-            info?.instructions
-              ?.replace(/<\/?[^>]+(>|$)/g, '') // remove HTML tags
-              ?.split('.')
-              ?.map((s: string) => s.trim())
-              ?.filter((s: string) => s.length > 0) || [];
-
-          return (
-            <View style={recipePageStyles.textContentContainer}>
-              <Text style={recipePageStyles.textContentTitle}>Instructions</Text>
-              <FlatList
-                data={steps}
-                keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                  <View style={recipePageStyles.stepItem}>
-                    <Text style={recipePageStyles.stepNumber}>{index + 1}.</Text>
-                    <Text style={recipePageStyles.stepText}>{item}.</Text>
-                  </View>
-                )}
-              />
+  const renderFlatListContent = () => {
+    if (activeTab === 'Ingredients') {
+      return {
+        data: info?.extendedIngredients || [],
+        keyExtractor: (item: any) => item.id.toString(),
+        numColumns: 2,
+        renderItem: ({ item }: any) => (
+          <View style={recipePageStyles.card}>
+            <ImageBackground
+              source={{ uri: `https://spoonacular.com/cdn/ingredients_250x250/${item.image}` }}
+              style={recipePageStyles.cardImage}
+              imageStyle={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
+            />
+            <View style={recipePageStyles.cardTextContainer}>
+              <Text style={recipePageStyles.cardTitle}>{item.name}</Text>
+              <Text style={recipePageStyles.cardSubtitle}>{item.aisle}</Text>
             </View>
-          );
-
-        case 'Nutrition':
-          return (
-            <View style={recipePageStyles.textContentContainer}>
-              <Text style={recipePageStyles.textContent}>
-                {info?.nutrition?.nutrients
-                  ?.slice(0, 5)
-                  ?.map((n: { name: string; amount: number; unit: string }) => `• ${n.name}: ${n.amount}${n.unit}`)
-                  ?.join('\n') || 'No nutrition information available.'}
-              </Text>
-            </View>
-          );
-
-      default:
-        return (
-          <View style={recipePageStyles.placeholderContainer}>
-            <Text style={recipePageStyles.placeholderText}>No content available.</Text>
           </View>
-        );
+        ),
+        ListEmptyComponent: () => (
+          <View style={recipePageStyles.placeholderContainer}>
+            <Text style={recipePageStyles.placeholderText}>
+              No ingredients found.
+            </Text>
+          </View>
+        ),
+      };
     }
+
+    if (activeTab === 'Preparation') {
+      const steps: string[] =
+        info?.instructions
+          ?.replace(/<\/?[^>]+(>|$)/g, '')
+          ?.split('.')
+          ?.map((s: string) => s.trim())
+          ?.filter((s: string) => s.length > 0) || [];
+
+      return {
+        data: steps,
+        keyExtractor: (_: string, index: number) => index.toString(),
+        renderItem: ({ item, index }: { item: string; index: number }) => (
+          <View style={recipePageStyles.stepItem}>
+            <Text style={recipePageStyles.stepNumber}>{index + 1}.</Text>
+            <Text style={recipePageStyles.stepText}>{item}.</Text>
+          </View>
+        ),
+        ListEmptyComponent: () => (
+          <View style={recipePageStyles.placeholderContainer}>            
+            <Text style={recipePageStyles.placeholderText}>
+              No preparation steps found.
+            </Text>
+          </View>
+        ),
+      };
+    }
+
+    return null;
   };
 
   if (loading || !info) {
@@ -133,7 +126,6 @@ const RecipePage =() => {
       </TouchableOpacity>
 
       <View style={recipePageStyles.headerContainer}>
-        {/* Title Row with Background */}
         <View style={recipePageStyles.titleRow}>
           <View style={recipePageStyles.titleWrapper}>
             <Text style={recipePageStyles.title}>{item.title}</Text>
@@ -152,20 +144,41 @@ const RecipePage =() => {
             ))}
           </View>
         </View>
-        {/* Subtitle, Rating, Description */}
+
         <Text style={recipePageStyles.subtitle}>Recipe</Text>
         <View style={recipePageStyles.ratingRow}>
           {[...Array(5)].map((_, i) => (
-            <MaterialIcons key={i} name="star" size={16} color="gold" />
+            <MaterialIcons
+              key={i}
+              name={i < Math.round((score ?? 0) / 20) ? 'star' : 'star-border'}
+              size={16}
+              color="gold"
+            />
           ))}
+          <Text style={recipePageStyles.ratingText}>
+            {Math.round((score ?? 0) / 20)}/5 Rating
+          </Text>
         </View>
-        <Text style={recipePageStyles.description}>
-          {info?.summary ? info.summary.replace(/<\/?[^>]+(>|$)/g, '') : 'No description available.'}
-        </Text>
+
+        <View style={recipePageStyles.descriptionContainer}>
+          <ScrollView
+            showsVerticalScrollIndicator={true}
+          >
+            <Text style={recipePageStyles.description}>
+              {info?.summary
+                ? info.summary.replace(/<\/?[^>]+(>|$)/g, '')
+                : 'No description available.'}
+            </Text>
+          </ScrollView>
+        </View>
       </View>
 
-      <View style={recipePageStyles.contentCard}>
-        {/* Tabs */}
+      <BottomSheet
+        index={0}
+        snapPoints={snapPoints}
+        enablePanDownToClose={false}
+        backgroundStyle={{ backgroundColor: 'white', borderRadius: 24 }}
+      >
         <View style={recipePageStyles.tabRow}>
           {TABS.map(tab => (
             <TouchableOpacity
@@ -178,11 +191,36 @@ const RecipePage =() => {
           ))}
         </View>
 
-        {renderTabContent()}
-      </View>
+        {(() => {
+          const flatListProps = renderFlatListContent();
+
+          if (flatListProps) {
+            return (
+              <BottomSheetFlatList
+                key={activeTab}
+                {...flatListProps}
+                contentContainerStyle={recipePageStyles.cardGrid}
+              />
+            );
+          }
+
+          return (
+            <BottomSheetScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}>
+              <View style={recipePageStyles.textContentContainer}>
+                <Text style={recipePageStyles.textContent}>
+                  {info?.nutrition?.nutrients
+                    ?.slice(0, 5)
+                    ?.map((n: { name: string; amount: number; unit: string }) => `• ${n.name}: ${n.amount}${n.unit}`)
+                    ?.join('\n') || 'No nutrition information available.'}
+                </Text>
+              </View>
+            </BottomSheetScrollView>
+          );
+        })()}
+
+      </BottomSheet>
     </ImageBackground>
-    
   );
-}
+};
 
 export default RecipePage;

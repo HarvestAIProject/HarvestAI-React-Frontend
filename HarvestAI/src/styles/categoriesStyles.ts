@@ -26,15 +26,15 @@ const categoriesStyles = StyleSheet.create({
   list: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    gap: 10,
   },
   categoryRow: {
     backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
-    paddingVertical: 14,
+    paddingVertical: 10,
     paddingHorizontal: 16,
-    marginBottom: 12,
   },
   rowContent: {
     flexDirection: 'row',
@@ -48,7 +48,8 @@ const categoriesStyles = StyleSheet.create({
   },
   categoryText: {
     fontFamily: 'InriaSerif-Regular',
-    fontSize: 24,
+    fontSize: 20,
+    color: '#000',
   },
 });
 

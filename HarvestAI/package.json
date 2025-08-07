@@ -13,6 +13,7 @@
     "@react-navigation/bottom-tabs": "^7.4.2",
     "@react-navigation/native": "^7.1.14",
     "@react-navigation/native-stack": "^7.3.21",
+    "babel-plugin-dotenv-import": "^3.0.1",
     "expo": "53.0.20",
     "expo-camera": "~16.1.11",
     "expo-font": "~13.3.2",
@@ -32,6 +33,7 @@
     "@types/node": "^24.0.10",
     "@types/react": "~19.0.10",
     "@vitejs/plugin-react": "^4.6.0",
+    "react-native-dotenv": "^3.4.11",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.8.3",
     "vite": "^7.0.2"
