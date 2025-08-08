@@ -48,3 +48,16 @@ export const fetchRecipesByCuisine = async (cuisine: string) => {
   if (!res.ok) throw new Error('Failed to fetch recipes by cuisine');
   return res.json();
 };
+
+export const fetchRecipesByImage = async (imageBlob: Blob) => {
+  const formData = new FormData();
+  formData.append('file', imageBlob, 'image.jpg');
+
+  const res = await fetch(`${BASE_URL}/recipes/by-ingredients`, {
+    method: 'POST',
+    body: formData,
+  });
+  
+  if (!res.ok) throw new Error('Failed to fetch recipes by image');
+  return res.json();
+};
