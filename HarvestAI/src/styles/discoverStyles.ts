@@ -4,11 +4,11 @@ const discoverStyles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  placeholderContainer: {
-    alignItems: 'center',
+  placeholderContent: {
+    flexGrow: 1,                  // stretch to fill FlatList height
+    justifyContent: 'center',     // vertical center
+    alignItems: 'center',         // horizontal center
     paddingHorizontal: 24,
   },
   placeholderTitle: {
@@ -16,6 +16,7 @@ const discoverStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 8,
+    textAlign: 'center',
   },
   placeholderSubtitle: {
     fontSize: 14,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import discoverStyles from '../../styles/discoverStyles';
 import { useNavigation } from '@react-navigation/native';
@@ -10,25 +10,30 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 const Discover = () => {
   const [recipes, setRecipes] = useState<ResultItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [loadingInitial, setLoadingInitial] = useState(true);  // initial load
+  const [loadingMore, setLoadingMore] = useState(false);       // pagination
+  const [refreshing, setRefreshing] = useState(false);         // pull-to-refresh
+
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const loadMoreRecipes = async () => {
-    if (loading) return;
-    setLoading(true);
+  // Optional: guard duplicate onEndReached triggers
+  const endReachedGuard = useRef(false);
+
+  const mergeUnique = (current: ResultItem[], incoming: ResultItem[]) => {
+    const existingIds = new Set(current.map(r => r.id));
+    return [...current, ...incoming.filter(r => !existingIds.has(r.id))];
+  };
+
+  const fetchInitial = async () => {
+    setLoadingInitial(true);
     try {
       const newRecipes = await fetchRandomRecipes();
-
-      // Filter out duplicates based on ID
-      const existingIds = new Set(recipes.map(r => r.id));
-      const uniqueNewRecipes = newRecipes.filter((r: ResultItem) => !existingIds.has(r.id));
-
-      setRecipes(prev => [...prev, ...uniqueNewRecipes]);
+      setRecipes(newRecipes);
     } catch (err) {
       console.error('Failed to fetch recipes:', err);
+    } finally {
+      setLoadingInitial(false);
     }
-    setLoading(false);
   };
 
   const refreshRecipes = async () => {
@@ -38,12 +43,28 @@ const Discover = () => {
       setRecipes(newRecipes);
     } catch (err) {
       console.error('Failed to refresh recipes:', err);
+    } finally {
+      setRefreshing(false);
     }
-    setRefreshing(false);
+  };
+
+  const loadMoreRecipes = async () => {
+    // Don’t paginate if we’re already loading, refreshing, or during initial load
+    if (loadingMore || loadingInitial || refreshing) return;
+
+    setLoadingMore(true);
+    try {
+      const newRecipes = await fetchRandomRecipes();
+      setRecipes(prev => mergeUnique(prev, newRecipes));
+    } catch (err) {
+      console.error('Failed to fetch more recipes:', err);
+    } finally {
+      setLoadingMore(false);
+    }
   };
 
   useEffect(() => {
-    loadMoreRecipes();
+    fetchInitial();
   }, []);
 
   const renderItem = ({ item }: { item: ResultItem }) => (
@@ -75,27 +96,46 @@ const Discover = () => {
     </TouchableOpacity>
   );
 
-
   return (
     <View style={discoverStyles.container}>
       <FlatList
         data={recipes}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
-        onEndReached={loadMoreRecipes}
+        onEndReached={() => {
+          if (!endReachedGuard.current) {
+            endReachedGuard.current = true;
+            loadMoreRecipes();
+          }
+        }}
+        onMomentumScrollBegin={() => {
+          endReachedGuard.current = false;
+        }}
         onEndReachedThreshold={0.5}
-        ListFooterComponent={loading ? <ActivityIndicator size="small" /> : null}
         refreshing={refreshing}
         onRefresh={refreshRecipes}
-        contentContainerStyle={recipes.length === 0 && discoverStyles.placeholderContainer}
-        ListEmptyComponent={
-          <View style={discoverStyles.placeholderContainer}>
-            <Text style={discoverStyles.placeholderTitle}>Feed looking empty :(</Text>
-            <Text style={discoverStyles.placeholderSubtitle}>
-              Come back soon to discover new recipes from the community!
-            </Text>
-          </View>
+        contentContainerStyle={
+          recipes.length === 0 ? discoverStyles.placeholderContent : undefined
         }
+        ListEmptyComponent={
+          loadingInitial ? (
+            // Initial load: centered spinner ONLY (no empty text)
+            <ActivityIndicator size="large" />
+          ) : (
+            // Empty state when not loading
+            <View>
+              <Text style={discoverStyles.placeholderTitle}>Feed looking empty :(</Text>
+              <Text style={discoverStyles.placeholderSubtitle}>
+                Come back soon to discover new recipes from the community!
+              </Text>
+            </View>
+          )
+        }
+        // Footer spinner ONLY when there are items and we’re paginating
+        ListFooterComponent={
+          recipes.length > 0 && loadingMore ? <ActivityIndicator size="small" /> : null
+        }
+        ListFooterComponentStyle={{ paddingVertical: 16 }}
       />
     </View>
   );
