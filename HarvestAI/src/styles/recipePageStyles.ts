@@ -133,14 +133,6 @@ const recipePageStyles = StyleSheet.create({
     fontSize: 14,
     fontStyle: 'italic',
   },
-  textContentContainer: {
-    padding: 16,
-  },
-  textContent: {
-    color: '#333',
-    fontSize: 14,
-    lineHeight: 22,
-  },
   stepItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -149,13 +141,15 @@ const recipePageStyles = StyleSheet.create({
   stepNumber: {
     fontWeight: 'bold',
     marginRight: 8,
-    color: '#6c9a83',
+    color: '#7ba890',
   },
-
   stepText: {
     flex: 1,
     fontSize: 14,
     color: '#444',
+  },
+  stepList: {
+    paddingTop: 8,
   },
   loadingContainer: {
     flex: 1,

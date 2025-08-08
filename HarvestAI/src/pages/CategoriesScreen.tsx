@@ -1,19 +1,40 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RootStackParamList } from '../types/navigation';
-import categoriesStyles from '../styles/categoriesStyles'; // Create this file if not done
+import categoriesStyles from '../styles/categoriesStyles';
+import { CategoryItem } from '../types/CategoryItem';
+import { fetchCategories as fetchCategoriesAPI } from '../api/recipeApi';
+import { fetchRecipesByCuisine } from '../api/recipeApi';
 
 const CategoriesScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
 
-  const categories = [
-    { name: 'Asian', image: 'https://example.com/asian.jpg' },
-    { name: 'Italian', image: 'https://example.com/italian.jpg' },
-    { name: 'Mexican', image: 'https://example.com/mexican.jpg' },
-  ];
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const data = await fetchCategoriesAPI();
+
+      const parsed: CategoryItem[] = data.map((item: any) => ({
+        name: item.name,
+        image: item.image,
+      }));
+
+      setCategories(parsed);
+    } catch (err) {
+      console.error('Failed to fetch categories', err);
+    }
+    setLoadingCategories(false);
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <View style={categoriesStyles.container}>
@@ -27,18 +48,35 @@ const CategoriesScreen = () => {
 
       {/* Categories Scrollable List */}
       <ScrollView contentContainerStyle={categoriesStyles.list}>
-        {categories.map((cat, idx) => (
-          <TouchableOpacity key={idx} style={categoriesStyles.categoryRow}>
-            <View style={categoriesStyles.rowContent}>
-              <Image
-                source={{ uri: cat.image }}
-                style={categoriesStyles.categoryImage}
-                resizeMode="cover"
-              />
-              <Text style={categoriesStyles.categoryText}>{cat.name}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {loadingCategories ? (
+          <Text style={categoriesStyles.placeholder}>Loading...</Text>
+        ) : categories.length === 0 ? (
+          <Text style={categoriesStyles.placeholder}>No categories found</Text>
+        ) : (
+          categories.map((cat, idx) => (
+            <TouchableOpacity
+              key={idx}
+              style={categoriesStyles.categoryRow}
+              onPress={async () => {
+                try {
+                  const response = await fetchRecipesByCuisine(cat.name); // Create this API call
+                  navigation.navigate('Results', { results: response, title: cat.name });
+                } catch (err) {
+                  console.error('Failed to fetch recipes by cuisine', err);
+                }
+              }}
+            >
+              <View style={categoriesStyles.rowContent}>
+                <Image
+                  source={{ uri: cat.image }}
+                  style={categoriesStyles.categoryImage}
+                  resizeMode="cover"
+                />
+                <Text style={categoriesStyles.categoryText}>{cat.name}</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
     </View>
   );

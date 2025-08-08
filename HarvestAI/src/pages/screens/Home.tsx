@@ -9,6 +9,7 @@ import homeStyles from '../../styles/homeStyles';
 import {
   fetchCategories as fetchCategoriesAPI,
   fetchPopularRecipes as fetchPopularRecipesAPI,
+  fetchRecipesByCuisine as fetchRecipesByCuisineAPI
 } from '../../api/recipeApi';
 
 const Home = () => {
@@ -191,7 +192,17 @@ const Home = () => {
               <TouchableOpacity
                 key={idx}
                 style={homeStyles.categoryButton}
-                // onPress={() => navigation.navigate('CategoryRecipes', { category: cat.name })}
+                onPress={async () => {
+                  try {
+                    const response = await fetchRecipesByCuisineAPI(cat.name);
+                    navigation.navigate('Results', {
+                      results: response.results || response, // depends on your backend shape
+                      title: cat.name
+                    });
+                  } catch (err) {
+                    console.error('Failed to fetch recipes for category:', cat.name, err);
+                  }
+                }}
               >
                 <View style={homeStyles.categoryRow}>
                   <Image source={{ uri: cat.image }} style={homeStyles.categoryCardImage} resizeMode="cover" />

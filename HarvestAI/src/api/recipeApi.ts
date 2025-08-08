@@ -35,3 +35,16 @@ export const fetchCategories = async () => {
   if (!res.ok) throw new Error('Failed to fetch categories');
   return res.json();
 };
+
+export const fetchRandomRecipes = async () => {
+  const res = await fetch(`${BASE_URL}/recipes/random`);
+  if (!res.ok) throw new Error('Failed to fetch random recipes');
+  const data = await res.json();
+  return data.recipes || data; // Adjust depending on backend shape
+};
+
+export const fetchRecipesByCuisine = async (cuisine: string) => {
+  const res = await fetch(`${BASE_URL}/recipes/cuisines?cuisine=${cuisine}`);
+  if (!res.ok) throw new Error('Failed to fetch recipes by cuisine');
+  return res.json();
+};

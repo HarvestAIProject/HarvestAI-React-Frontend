@@ -15,7 +15,7 @@ import { RootStackParamList } from '../types/navigation';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import recipePageStyles from '../styles/recipePageStyles';
-import { fetchRecipeInfo } from '../api/recipeApi';
+import { fetchRecipeInfo, fetchRecipeNutrition } from '../api/recipeApi';
 
 const TABS = ['Ingredients', 'Preparation', 'Nutrition'];
 
@@ -32,8 +32,10 @@ const RecipePage = () => {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const data = await fetchRecipeInfo(item.id);
-        setInfo(data);
+        const data = await fetchRecipeInfo(item.id);           // /info?id={id}
+        const nutrition = await fetchRecipeNutrition(item.id); // /nutrition?id={id}
+
+        setInfo({ ...data, nutrition }); // merge both
       } catch (err) {
         console.error('Failed to fetch recipe info', err);
       }
@@ -205,14 +207,24 @@ const RecipePage = () => {
           }
 
           return (
-            <BottomSheetScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}>
-              <View style={recipePageStyles.textContentContainer}>
-                <Text style={recipePageStyles.textContent}>
-                  {info?.nutrition?.nutrients
-                    ?.slice(0, 5)
-                    ?.map((n: { name: string; amount: number; unit: string }) => `• ${n.name}: ${n.amount}${n.unit}`)
-                    ?.join('\n') || 'No nutrition information available.'}
-                </Text>
+            <BottomSheetScrollView contentContainerStyle={{ padding: 20 }}>
+              <View style={recipePageStyles.stepList}>
+                {info?.nutrition?.nutrients?.length > 0 ? (
+                  info.nutrition.nutrients.map(
+                    (n: { name: string; amount: number; unit: string }, index: number) => (
+                      <View key={index} style={recipePageStyles.stepItem}>
+                        <Text style={[recipePageStyles.stepNumber, { color: 'green' }]}>•</Text>
+                        <Text style={recipePageStyles.stepText}>
+                          {n.name}: {n.amount}{n.unit}
+                        </Text>
+                      </View>
+                    )
+                  )
+                ) : (
+                  <Text style={recipePageStyles.placeholderText}>
+                    No nutrition information available.
+                  </Text>
+                )}
               </View>
             </BottomSheetScrollView>
           );
