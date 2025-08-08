@@ -21,7 +21,6 @@ const RecipeOverviewScreen = () => {
   const [nutrition, setNutrition] = useState<any>(null);
   const [summary, setSummary] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
-  const [score, setScore] = useState<number | null>(null);
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -43,7 +42,7 @@ const RecipeOverviewScreen = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const [nutData, sumData, infoData] = await Promise.all([
+        const [nutData, sumData ] = await Promise.all([
           fetchRecipeNutrition(item.id),
           fetchRecipeSummary(item.id),
           fetchRecipeInfo(item.id),
@@ -51,7 +50,6 @@ const RecipeOverviewScreen = () => {
 
         setNutrition(nutData);
         setSummary(sumData.summary);
-        setScore(infoData.spoonacularScore);
       } catch (err) {
         console.error('Failed to fetch recipe details:', err);
       }
@@ -61,8 +59,9 @@ const RecipeOverviewScreen = () => {
   }, []);
 
   const renderStars = () => {
-    if (score === null) return null;
-    const starCount = Math.round(score / 20); // spoonacularScore out of 100
+    const score = item.spoonacularScore ?? 0;
+    const starCount = Math.round(score / 20);
+
     return (
       <>
         {[...Array(5)].map((_, i) => (
@@ -76,10 +75,10 @@ const RecipeOverviewScreen = () => {
       </>
     );
   };
-  
+
   const renderScoreText = () => {
-    if (score === null) return null;
-    const starCount = Math.round(score / 20); // 100 max → 5 stars
+    const score = item.spoonacularScore ?? 0;
+    const starCount = Math.round(score / 20);
     return (
       <Text style={recipeOverviewStyles.likesText}>
         {starCount}/5 Rating
@@ -160,7 +159,7 @@ const RecipeOverviewScreen = () => {
           {/* Buttons */}
           <TouchableOpacity
             style={recipeOverviewStyles.viewButton}
-            onPress={() => navigation.navigate('RecipePage', { item, score })}
+            onPress={() => navigation.navigate('RecipePage', { item, score: item.spoonacularScore ?? 0 })}
           >
             <Text style={recipeOverviewStyles.viewButtonText}>View Recipe Book</Text>
           </TouchableOpacity>

@@ -95,19 +95,8 @@ const resultsOverlayStyles = StyleSheet.create({
   },
   ratingText: {
     color: '#444',
-    fontSize: 14,
+    fontSize: 12,
     marginLeft: 4,
-  },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 8,
-  },
-  link: {
-    color: '#555',
-    fontStyle: 'italic',
-    fontSize: 14,
   },
 });
 

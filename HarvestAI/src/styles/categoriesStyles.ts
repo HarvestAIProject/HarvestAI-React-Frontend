@@ -25,7 +25,7 @@ const categoriesStyles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 18,
     gap: 10,
   },
   categoryRow: {
@@ -50,6 +50,12 @@ const categoriesStyles = StyleSheet.create({
     fontFamily: 'InriaSerif-Regular',
     fontSize: 20,
     color: '#000',
+  },
+  placeholder: {
+    fontSize: 16,
+    fontFamily: 'InriaSerif-Italic',
+    color: '#888',
+    marginBottom: 16,
   },
 });
 

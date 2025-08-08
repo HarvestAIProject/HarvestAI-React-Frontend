@@ -115,7 +115,8 @@ const ResultsOverlay = ({ results, onClose, visible, onCloseComplete }: Props) =
 
                       <View style={styles.ratingRow}>
                         {Array.from({ length: 5 }).map((_, index) => {
-                          const diff = item.rating - index;
+                          const score = item.spoonacularScore ?? 0;
+                          const diff = score / 20 - index;
                           let iconName: 'star' | 'star-half' | 'star-border' = 'star-border';
                           if (diff >= 1) iconName = 'star';
                           else if (diff >= 0.5) iconName = 'star-half';
@@ -130,12 +131,11 @@ const ResultsOverlay = ({ results, onClose, visible, onCloseComplete }: Props) =
                             />
                           );
                         })}
-                        <Text style={styles.ratingText}>{item.rating.toFixed(1)}</Text>
+                        <Text style={styles.ratingText}>
+                          {(item.spoonacularScore ?? 0 / 20).toFixed(1)}
+                        </Text>
                       </View>
 
-                      <View style={styles.footerRow}>
-                        <Text style={styles.link}>{item.link}</Text>
-                      </View>
                     </View>
                   </View>
                 </TouchableOpacity>
