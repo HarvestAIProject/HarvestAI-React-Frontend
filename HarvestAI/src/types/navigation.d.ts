@@ -6,5 +6,5 @@ export type RootStackParamList = {
   RecipePage: { item: ResultItem; score: number | null};
   Search: undefined;
   Categories: undefined;
-  Results: { results: ResultItem[]; title: string };
+  CategoriesResults: { results: ResultItem[]; title: string };
 };

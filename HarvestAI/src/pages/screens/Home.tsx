@@ -195,7 +195,7 @@ const Home = () => {
                 onPress={async () => {
                   try {
                     const response = await fetchRecipesByCuisineAPI(cat.name);
-                    navigation.navigate('Results', {
+                    navigation.navigate('CategoriesResults', {
                       results: response.results || response, // depends on your backend shape
                       title: cat.name
                     });

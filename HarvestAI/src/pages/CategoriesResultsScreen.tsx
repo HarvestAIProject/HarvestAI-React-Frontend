@@ -1,6 +1,6 @@
 import { View, ScrollView, Text, TouchableOpacity, Image, FlatList } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import resultsScreenStyles from '../styles/resultsScreenStyles';
+import resultsScreenStyles from '../styles/catgoriesResultsScreenStyles';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
@@ -9,7 +9,7 @@ import { ResultItem } from '../types/ResultItem';
 
 const ResultsScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, 'Results'>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'CategoriesResults'>>();
   const { results, title } = route.params;
 
   const renderCard = (item: ResultItem) => {
