@@ -153,7 +153,7 @@ const Home = () => {
                     <View style={homeStyles.cardInfo}>
                       <Text style={homeStyles.cardTitle} numberOfLines={2}>{dish.title}</Text>
                       <View style={homeStyles.cardDivider} />
-                      <Text style={homeStyles.cardLink}>Recipe</Text>
+                      <Text style={homeStyles.subtitle}>Recipe</Text>
                     </View>
                   </View>
                 </TouchableOpacity>

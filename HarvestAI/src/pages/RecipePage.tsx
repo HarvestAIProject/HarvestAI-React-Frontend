@@ -16,6 +16,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import recipePageStyles from '../styles/recipePageStyles';
 import { fetchRecipeInfo, fetchRecipeNutrition } from '../api/recipeApi';
+import { useFavorites } from '../context/FavoritesContext';
+import type { FavoriteItem } from '../types/FavoriteItem';
 
 const TABS = ['Ingredients', 'Preparation', 'Nutrition'];
 
@@ -28,6 +30,13 @@ const RecipePage = () => {
   const [info, setInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const snapPoints = useMemo(() => ['30%', '85%'], []);
+
+  const { isFavorite, toggle } = useFavorites();
+  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    setLiked(isFavorite(item.id));
+  }, [isFavorite, item.id]);
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -112,6 +121,12 @@ const RecipePage = () => {
     );
   }
 
+  const onToggleLike = async () => {
+    const minimal: FavoriteItem = { id: item.id, title: item.title, image: item.image };
+    const nowLiked = await toggle(minimal);
+    setLiked(nowLiked);
+  };
+
   return (
     <ImageBackground
       source={{ uri: item.image }}
@@ -134,16 +149,27 @@ const RecipePage = () => {
           </View>
 
           <View style={recipePageStyles.iconGroup}>
-            {[
-              { icon: 'favorite-border', label: 'Like' },
-              { icon: 'content-copy', label: 'Copy' },
-              { icon: 'share', label: 'Share' },
-            ].map(({ icon, label }) => (
-              <View key={label} style={recipePageStyles.iconWrapper}>
-                <MaterialIcons name={icon as any} size={24} color="white" />
-                <Text style={recipePageStyles.iconLabel}>{label}</Text>
-              </View>
-            ))}
+            {/* Like */}
+            <TouchableOpacity onPress={onToggleLike} style={recipePageStyles.iconWrapper} activeOpacity={0.7}>
+              <MaterialIcons
+                name={liked ? 'favorite' : 'favorite-border'}
+                size={24}
+                color="white"
+              />
+              <Text style={recipePageStyles.iconLabel}>{liked ? 'Liked' : 'Like'}</Text>
+            </TouchableOpacity>
+
+            {/* Copy */}
+            <TouchableOpacity onPress={() => console.log('Copy')} style={recipePageStyles.iconWrapper} activeOpacity={0.7}>
+              <MaterialIcons name="content-copy" size={24} color="white" />
+              <Text style={recipePageStyles.iconLabel}>Copy</Text>
+            </TouchableOpacity>
+
+            {/* Share */}
+            <TouchableOpacity onPress={() => console.log('Share')} style={recipePageStyles.iconWrapper} activeOpacity={0.7}>
+              <MaterialIcons name="share" size={24} color="white" />
+              <Text style={recipePageStyles.iconLabel}>Share</Text>
+            </TouchableOpacity>
           </View>
         </View>
 

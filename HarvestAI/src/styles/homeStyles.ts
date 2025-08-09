@@ -85,34 +85,29 @@ const homeStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   cardImage: {
     width: 80,
     height: 80,
     borderRadius: 8,
     marginRight: 12,
   },
-
   cardInfo: {
     flex: 1,
     justifyContent: 'flex-start',
   },
-
   cardTitle: {
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
     color: '#000',
   },
-
   cardDivider: {
     height: 1,
     backgroundColor: '#a0aec0',
     width: '60%',
     marginVertical: 4,
   },
-
-  cardLink: {
+  subtitle: {
     color: '#7BA890',
     fontWeight: '500',
     fontSize: 14,

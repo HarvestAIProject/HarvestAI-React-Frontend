@@ -65,7 +65,7 @@ const recipePageStyles = StyleSheet.create({
   descriptionContainer: {
     marginTop: 8,
     marginBottom: 12,
-    maxHeight: '40%',
+    maxHeight: '60%',
     overflow: 'hidden',
   },
   description: {

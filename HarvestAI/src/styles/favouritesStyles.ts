@@ -34,6 +34,43 @@ const favouritesStyles = StyleSheet.create({
     color: '#999',
     textAlign: 'center',
   },
+  card: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  cardImage: {
+    width: '100%',
+    height: 150,
+  },
+  cardContent: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    alignItems: 'flex-start',
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontFamily: 'InriaSerif-Bold',
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: '#a0aec0',
+    width: '60%',
+    marginVertical: 8,
+  },
+  subtitle: {
+    color: '#7BA890',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  listContent: {
+    paddingTop: 12,
+    paddingBottom: 24,
+  },
 });
 
 export default favouritesStyles;

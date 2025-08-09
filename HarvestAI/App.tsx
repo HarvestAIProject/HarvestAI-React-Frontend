@@ -1,9 +1,11 @@
+import 'react-native-reanimated';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import 'react-native-reanimated';
 
 import AppNavigator from './src/routes/AppNavigator';
+import { FavoritesProvider } from './src/context/FavoritesContext';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -16,9 +18,11 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
+      <FavoritesProvider>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </FavoritesProvider>
     </GestureHandlerRootView>
   );
 }

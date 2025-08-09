@@ -11,57 +11,68 @@ import {
   fetchRecipeNutrition,
   fetchRecipeSummary,
 } from '../api/recipeApi';
+import { useFavorites } from '../context/FavoritesContext';
+import type { FavoriteItem } from '../types/FavoriteItem';
 
 const RecipeOverviewScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'RecipeOverview'>>();
   const { item } = route.params;
 
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const { isFavorite, toggle } = useFavorites();
   const [liked, setLiked] = useState(false);
 
   const [nutrition, setNutrition] = useState<any>(null);
   const [summary, setSummary] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
 
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  // ⭐ local rating that falls back to fetched info if item has no score
+  const [ratingScore, setRatingScore] = useState<number>(item.spoonacularScore ?? 0);
 
+  // keep heart in sync with favorites
   useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const data = await fetchRecipeInfo(item.id);
-        setTags([
-          ...(data.dishTypes || []),
-          ...(data.cuisines || []),
-        ]);
-      } catch (e) {
-        console.error("Failed to fetch tags", e);
-      }
-    };
-    fetchTags();
-  }, []);
+    setLiked(isFavorite(item.id));
+  }, [isFavorite, item.id]);
 
+  // fetch info/summary/nutrition once; populate tags + score from info
   useEffect(() => {
-    const fetchDetails = async () => {
+    let isMounted = true;
+    (async () => {
       try {
-        const [nutData, sumData ] = await Promise.all([
+        const [nutData, sumData, infoData] = await Promise.all([
           fetchRecipeNutrition(item.id),
           fetchRecipeSummary(item.id),
           fetchRecipeInfo(item.id),
         ]);
 
+        if (!isMounted) return;
+
         setNutrition(nutData);
-        setSummary(sumData.summary);
+        setSummary(sumData?.summary ?? '');
+
+        // tags from info
+        const nextTags: string[] = [
+          ...((infoData?.dishTypes as string[] | undefined) ?? []),
+          ...((infoData?.cuisines as string[] | undefined) ?? []),
+        ];
+        setTags(nextTags);
+
+        // update rating if available
+        if (typeof infoData?.spoonacularScore === 'number') {
+          setRatingScore(infoData.spoonacularScore);
+        }
       } catch (err) {
         console.error('Failed to fetch recipe details:', err);
       }
+    })();
+    return () => {
+      isMounted = false;
     };
-
-    fetchDetails();
-  }, []);
+  }, [item.id]);
 
   const renderStars = () => {
-    const score = item.spoonacularScore ?? 0;
-    const starCount = Math.round(score / 20);
-
+    const starCount = Math.round((ratingScore ?? 0) / 20);
     return (
       <>
         {[...Array(5)].map((_, i) => (
@@ -77,13 +88,23 @@ const RecipeOverviewScreen = () => {
   };
 
   const renderScoreText = () => {
-    const score = item.spoonacularScore ?? 0;
-    const starCount = Math.round(score / 20);
+    const starCount = Math.round((ratingScore ?? 0) / 20);
     return (
       <Text style={recipeOverviewStyles.likesText}>
         {starCount}/5 Rating
       </Text>
     );
+  };
+
+  const onToggleLike = async () => {
+    const minimal: FavoriteItem = {
+      id: item.id,
+      title: item.title,
+      image: item.image,
+      spoonacularScore: item.spoonacularScore ?? ratingScore ?? 0,
+    };
+    const nowLiked = await toggle(minimal);
+    setLiked(nowLiked);
   };
 
   return (
@@ -114,7 +135,7 @@ const RecipeOverviewScreen = () => {
                 {item.title}
               </Text>
             </View>
-            <TouchableOpacity onPress={() => setLiked(!liked)}>
+            <TouchableOpacity onPress={onToggleLike}>
               <MaterialIcons
                 name={liked ? 'favorite' : 'favorite-border'}
                 size={24}
@@ -130,10 +151,11 @@ const RecipeOverviewScreen = () => {
           </View>
 
           {/* Tags */}
-          <ScrollView 
+          <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={recipeOverviewStyles.tagsRow}>
+            style={recipeOverviewStyles.tagsRow}
+          >
             {tags.length > 0 && (
               <View style={recipeOverviewStyles.tagsRow}>
                 {tags.map((tag, idx) => (
@@ -148,7 +170,7 @@ const RecipeOverviewScreen = () => {
             {summary ? (
               <ScrollView style={recipeOverviewStyles.descriptionContainer}>
                 <Text style={recipeOverviewStyles.description}>
-                  {summary.replace(/<\/?[^>]+(>|$)/g, '')} {/* Strip HTML tags */}
+                  {summary.replace(/<\/?[^>]+(>|$)/g, '')}
                 </Text>
               </ScrollView>
             ) : (
@@ -159,7 +181,7 @@ const RecipeOverviewScreen = () => {
           {/* Buttons */}
           <TouchableOpacity
             style={recipeOverviewStyles.viewButton}
-            onPress={() => navigation.navigate('RecipePage', { item, score: item.spoonacularScore ?? 0 })}
+            onPress={() => navigation.navigate('RecipePage', { item, score: ratingScore ?? 0 })}
           >
             <Text style={recipeOverviewStyles.viewButtonText}>View Recipe Book</Text>
           </TouchableOpacity>
