@@ -18,6 +18,9 @@ import recipePageStyles from '../styles/recipePageStyles';
 import { fetchRecipeInfo, fetchRecipeNutrition } from '../api/recipeApi';
 import { useFavorites } from '../context/FavoritesContext';
 import type { FavoriteItem } from '../types/FavoriteItem';
+import * as Clipboard from 'expo-clipboard';
+import { showToast } from '../utils/toast';
+import { recipeCopyText } from '../utils/shareText';
 
 const TABS = ['Ingredients', 'Preparation', 'Nutrition'];
 
@@ -33,6 +36,16 @@ const RecipePage = () => {
 
   const { isFavorite, toggle } = useFavorites();
   const [liked, setLiked] = useState(false);
+
+  const prepSteps = useMemo(() => {
+    const raw = info?.instructions ?? '';
+    if (typeof raw !== 'string' || !raw.trim()) return [];
+    return raw
+      .replace(/<\/?[^>]+(>|$)/g, '')
+      .split('.')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+  }, [info?.instructions]);
 
   useEffect(() => {
     setLiked(isFavorite(item.id));
@@ -83,32 +96,23 @@ const RecipePage = () => {
       };
     }
 
-    if (activeTab === 'Preparation') {
-      const steps: string[] =
-        info?.instructions
-          ?.replace(/<\/?[^>]+(>|$)/g, '')
-          ?.split('.')
-          ?.map((s: string) => s.trim())
-          ?.filter((s: string) => s.length > 0) || [];
-
-      return {
-        data: steps,
-        keyExtractor: (_: string, index: number) => index.toString(),
-        renderItem: ({ item, index }: { item: string; index: number }) => (
-          <View style={recipePageStyles.stepItem}>
-            <Text style={recipePageStyles.stepNumber}>{index + 1}.</Text>
-            <Text style={recipePageStyles.stepText}>{item}.</Text>
-          </View>
-        ),
-        ListEmptyComponent: () => (
-          <View style={recipePageStyles.placeholderContainer}>            
-            <Text style={recipePageStyles.placeholderText}>
-              No preparation steps found.
-            </Text>
-          </View>
-        ),
-      };
-    }
+  if (activeTab === 'Preparation') {
+    return {
+      data: prepSteps,
+      keyExtractor: (_: string, index: number) => index.toString(),
+      renderItem: ({ item, index }: { item: string; index: number }) => (
+        <View style={recipePageStyles.stepItem}>
+          <Text style={recipePageStyles.stepNumber}>{index + 1}.</Text>
+          <Text style={recipePageStyles.stepText}>{item}.</Text>
+        </View>
+      ),
+      ListEmptyComponent: () => (
+        <View style={recipePageStyles.placeholderContainer}>
+          <Text style={recipePageStyles.placeholderText}>No preparation steps found.</Text>
+        </View>
+      ),
+    };
+  }
 
     return null;
   };
@@ -125,6 +129,27 @@ const RecipePage = () => {
     const minimal: FavoriteItem = { id: item.id, title: item.title, image: item.image };
     const nowLiked = await toggle(minimal);
     setLiked(nowLiked);
+  };
+
+  const handleCopy = async () => {
+    try {
+      const caloriesNutr = info?.nutrition?.nutrients?.find?.(
+        (n: any) => n?.name === 'Calories'
+      );
+
+      const text = recipeCopyText({
+        title: item.title,
+        score: score ?? undefined,
+        calories: caloriesNutr?.amount ? String(caloriesNutr.amount) : undefined,
+        steps: prepSteps,
+      });
+
+      await Clipboard.setStringAsync(text);
+      showToast('Recipe copied');
+    } catch (e) {
+      showToast('Could not copy. Try again.');
+      console.error(e);
+    }
   };
 
   return (
@@ -160,7 +185,7 @@ const RecipePage = () => {
             </TouchableOpacity>
 
             {/* Copy */}
-            <TouchableOpacity onPress={() => console.log('Copy')} style={recipePageStyles.iconWrapper} activeOpacity={0.7}>
+            <TouchableOpacity onPress={handleCopy} style={recipePageStyles.iconWrapper} activeOpacity={0.7}>
               <MaterialIcons name="content-copy" size={24} color="white" />
               <Text style={recipePageStyles.iconLabel}>Copy</Text>
             </TouchableOpacity>

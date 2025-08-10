@@ -13,6 +13,9 @@ import {
 } from '../api/recipeApi';
 import { useFavorites } from '../context/FavoritesContext';
 import type { FavoriteItem } from '../types/FavoriteItem';
+import * as Clipboard from 'expo-clipboard';
+import { showToast } from '../utils/toast';
+import { recipeCopyText } from '../utils/shareText';
 
 const RecipeOverviewScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'RecipeOverview'>>();
@@ -27,8 +30,8 @@ const RecipeOverviewScreen = () => {
   const [summary, setSummary] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
 
-  // ⭐ local rating that falls back to fetched info if item has no score
   const [ratingScore, setRatingScore] = useState<number>(item.spoonacularScore ?? 0);
+  const [steps, setSteps] = useState<string[]>([]);
 
   // keep heart in sync with favorites
   useEffect(() => {
@@ -62,6 +65,17 @@ const RecipeOverviewScreen = () => {
         if (typeof infoData?.spoonacularScore === 'number') {
           setRatingScore(infoData.spoonacularScore);
         }
+
+        const raw = infoData?.instructions ?? '';
+        const nextSteps =
+          typeof raw === 'string' && raw.trim()
+            ? raw
+                .replace(/<\/?[^>]+(>|$)/g, '')
+                .split('.')
+                .map((s: string) => s.trim())
+                .filter((s: string) => s.length > 0)
+            : [];
+        setSteps(nextSteps);
       } catch (err) {
         console.error('Failed to fetch recipe details:', err);
       }
@@ -105,6 +119,22 @@ const RecipeOverviewScreen = () => {
     };
     const nowLiked = await toggle(minimal);
     setLiked(nowLiked);
+  };
+
+  const handleCopy = async () => {
+    try {
+      const text = recipeCopyText({
+        title: item.title,
+        score: ratingScore,
+        calories: nutrition?.calories ? String(nutrition.calories) : undefined,
+        steps,
+      });
+      await Clipboard.setStringAsync(text);
+      showToast('Recipe copied');
+    } catch (e) {
+      showToast('Could not copy. Try again.');
+      console.error(e);
+    }
   };
 
   return (
@@ -192,10 +222,9 @@ const RecipeOverviewScreen = () => {
             </Text>
           </View>
 
-          {/* Share */}
           <View style={recipeOverviewStyles.rowEnd}>
             <View style={recipeOverviewStyles.iconButton}>
-              <TouchableOpacity onPress={() => console.log('Recipe copied!')} style={recipeOverviewStyles.iconTouch}>
+              <TouchableOpacity onPress={handleCopy} style={recipeOverviewStyles.iconTouch}>
                 <MaterialIcons name="content-copy" size={24} color="#444" />
               </TouchableOpacity>
               <Text style={recipeOverviewStyles.iconLabel}>Copy</Text>
