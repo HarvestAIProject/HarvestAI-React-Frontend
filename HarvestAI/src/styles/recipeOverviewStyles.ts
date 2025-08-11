@@ -109,6 +109,10 @@ const recipeOverviewStyles = StyleSheet.create({
     iconTouch: {
       padding: 2,
     },
+    disabledButton: {
+      opacity: 0.5,
+      backgroundColor: '#eee',
+    },
     iconLabel: {
       color: '#444',
       fontSize: 10,

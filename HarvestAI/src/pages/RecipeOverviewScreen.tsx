@@ -31,6 +31,9 @@ const RecipeOverviewScreen = () => {
   const [tags, setTags] = useState<string[]>([]);
 
   const [ratingScore, setRatingScore] = useState<number>(item.spoonacularScore ?? 0);
+
+  const [detailsLoaded, setDetailsLoaded] = useState(false);
+
   const [steps, setSteps] = useState<string[]>([]);
   const [ingredientsList, setIngredientsList] = useState<string[]>([]);
 
@@ -90,6 +93,9 @@ const RecipeOverviewScreen = () => {
           })
           .filter((s: string) => s.length > 0);
         setIngredientsList(nextIngredients);
+
+        setDetailsLoaded(true);
+
       } catch (err) {
         console.error('Failed to fetch recipe details:', err);
       }
@@ -136,13 +142,16 @@ const RecipeOverviewScreen = () => {
   };
 
   const handleCopy = async () => {
+    if (!detailsLoaded) {
+      showToast('Loading recipe details…');
+      return;
+    }
     try {
       const text = recipeCopyText({
         title: item.title,
         score: ratingScore,
         calories: nutrition?.calories ? String(nutrition.calories) : undefined,
-        steps,
-        ingredients: ingredientsList,
+        steps, // if loaded but empty, this will intentionally show "No Instructions Found"
       });
       await Clipboard.setStringAsync(text);
       showToast('Recipe copied');
@@ -153,15 +162,17 @@ const RecipeOverviewScreen = () => {
   };
 
   const handleShare = async () => {
+    if (!detailsLoaded) {
+      showToast('Loading recipe details…');
+      return;
+    }
     try {
       const text = recipeCopyText({
         title: item.title,
         score: ratingScore,
         calories: nutrition?.calories ? String(nutrition.calories) : undefined,
         steps,
-        ingredients: ingredientsList,
       });
-
       const result = await Share.share(
         Platform.select({
           ios: { message: text },
@@ -169,10 +180,7 @@ const RecipeOverviewScreen = () => {
           default: { message: text },
         })!
       );
-
-      if (result.action === Share.sharedAction) {
-        showToast('Shared!');
-      }
+      if (result.action === Share.sharedAction) showToast('Shared!');
     } catch (e) {
       showToast('Could not share. Try again.');
       console.error(e);
@@ -266,14 +274,26 @@ const RecipeOverviewScreen = () => {
 
           <View style={recipeOverviewStyles.rowEnd}>
             <View style={recipeOverviewStyles.iconButton}>
-              <TouchableOpacity onPress={handleCopy} style={recipeOverviewStyles.iconTouch}>
+              <TouchableOpacity
+                onPress={handleCopy} 
+                disabled={!detailsLoaded} 
+                style={[
+                  recipeOverviewStyles.iconTouch,
+                  !detailsLoaded && recipeOverviewStyles.disabledButton
+                ]}>
                 <MaterialIcons name="content-copy" size={24} color="#444" />
               </TouchableOpacity>
               <Text style={recipeOverviewStyles.iconLabel}>Copy</Text>
             </View>
 
             <View style={recipeOverviewStyles.iconButton}>
-              <TouchableOpacity onPress={handleShare} style={recipeOverviewStyles.iconTouch}>
+              <TouchableOpacity 
+                onPress={handleShare} 
+                disabled={!detailsLoaded} 
+                style={[
+                  recipeOverviewStyles.iconTouch,
+                  !detailsLoaded && recipeOverviewStyles.disabledButton
+                ]}>
                 <MaterialIcons name="share" size={24} color="#444" />
               </TouchableOpacity>
               <Text style={recipeOverviewStyles.iconLabel}>Share</Text>
