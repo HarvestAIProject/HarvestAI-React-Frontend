@@ -5,6 +5,8 @@ import {
   Text,
   TouchableOpacity,
   ImageBackground,
+  Share,
+  Platform,
 } from 'react-native';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import BottomSheet, {
@@ -152,6 +154,36 @@ const RecipePage = () => {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      const caloriesNutr = info?.nutrition?.nutrients?.find?.(
+        (n: any) => n?.name === 'Calories'
+      );
+
+      const text = recipeCopyText({
+        title: item.title,
+        score: score ?? undefined,
+        calories: caloriesNutr?.amount ? String(caloriesNutr.amount) : undefined,
+        steps: prepSteps,
+      });
+
+      const result = await Share.share(
+        Platform.select({
+          ios: { message: text },
+          android: { message: text, title: item.title },
+          default: { message: text },
+        })!
+      );
+
+      if (result.action === Share.sharedAction) {
+        showToast('Shared!');
+      }
+    } catch (e) {
+      showToast('Could not share. Try again.');
+      console.error(e);
+    }
+  };
+
   return (
     <ImageBackground
       source={{ uri: item.image }}
@@ -191,7 +223,7 @@ const RecipePage = () => {
             </TouchableOpacity>
 
             {/* Share */}
-            <TouchableOpacity onPress={() => console.log('Share')} style={recipePageStyles.iconWrapper} activeOpacity={0.7}>
+            <TouchableOpacity onPress={handleShare} style={recipePageStyles.iconWrapper} activeOpacity={0.7}>
               <MaterialIcons name="share" size={24} color="white" />
               <Text style={recipePageStyles.iconLabel}>Share</Text>
             </TouchableOpacity>
@@ -258,7 +290,7 @@ const RecipePage = () => {
           }
 
           return (
-            <BottomSheetScrollView contentContainerStyle={{ padding: 20 }}>
+            <BottomSheetScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}>
               <View style={recipePageStyles.stepList}>
                 {info?.nutrition?.nutrients?.length > 0 ? (
                   info.nutrition.nutrients.map(

@@ -1,6 +1,6 @@
 // RecipeOverviewScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, Share, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -137,6 +137,32 @@ const RecipeOverviewScreen = () => {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      const text = recipeCopyText({
+        title: item.title,
+        score: ratingScore,
+        calories: nutrition?.calories ? String(nutrition.calories) : undefined,
+        steps,
+      });
+
+      const result = await Share.share(
+        Platform.select({
+          ios: { message: text },
+          android: { message: text, title: item.title },
+          default: { message: text },
+        })!
+      );
+
+      if (result.action === Share.sharedAction) {
+        showToast('Shared!');
+      }
+    } catch (e) {
+      showToast('Could not share. Try again.');
+      console.error(e);
+    }
+  };
+
   return (
     <ImageBackground
       source={{ uri: item.image }}
@@ -231,7 +257,7 @@ const RecipeOverviewScreen = () => {
             </View>
 
             <View style={recipeOverviewStyles.iconButton}>
-              <TouchableOpacity onPress={() => console.log('Share?')} style={recipeOverviewStyles.iconTouch}>
+              <TouchableOpacity onPress={handleShare} style={recipeOverviewStyles.iconTouch}>
                 <MaterialIcons name="share" size={24} color="#444" />
               </TouchableOpacity>
               <Text style={recipeOverviewStyles.iconLabel}>Share</Text>
