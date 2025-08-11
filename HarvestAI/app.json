@@ -3,6 +3,7 @@
     "name": "HarvestAI",
     "slug": "HarvestAI",
     "version": "1.0.0",
+    "scheme": "harvestai",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -42,7 +43,9 @@
           "imageWidth": 200
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-web-browser",
+      "expo-secure-store"
     ]
   }
 }

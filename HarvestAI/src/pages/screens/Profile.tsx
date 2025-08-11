@@ -1,8 +1,9 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import profileStyles from '../../styles/profileStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import EditProfileModal from '../EditProfileModal'; 
+import { useAuth } from '@clerk/clerk-expo';
 
 type Props = {
   userName: string;
@@ -16,6 +17,8 @@ type Props = {
 const Profile = ({ userName, bio, profileImage, setUserName, setBio, setProfileImage }: Props) => {
   const [activeTab, setActiveTab] = useState<'saved' | 'posts'>('saved');
   const [showEditModal, setShowEditModal] = useState(false);
+  const { signOut } = useAuth();
+
   const getIconColor = (tab: string) => (activeTab === tab ? '#6c9a83' : '#999');
   const getTextStyle = (tab: string) => [
     profileStyles.sectionText,
@@ -26,7 +29,26 @@ const Profile = ({ userName, bio, profileImage, setUserName, setBio, setProfileI
     setShowEditModal(true);
   };
 
-  const handleSettings = () => {
+  const handleSignOut = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+            } catch (err) {
+              console.error('Error signing out:', err);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
@@ -36,8 +58,8 @@ const Profile = ({ userName, bio, profileImage, setUserName, setBio, setProfileI
         <TouchableOpacity style={profileStyles.iconButton} onPress={handleEditProfile}>
           <Ionicons name="pencil-outline" size={22} color="#000" />
         </TouchableOpacity>
-        <TouchableOpacity style={profileStyles.iconButton} onPress={handleSettings}>
-          <Ionicons name="settings-outline" size={22} color="#000" />
+        <TouchableOpacity style={profileStyles.iconButton} onPress={handleSignOut}>
+          <Ionicons name="log-out-outline" size={22} color="#EF4444" />
         </TouchableOpacity>
       </View>
 
@@ -80,11 +102,12 @@ const Profile = ({ userName, bio, profileImage, setUserName, setBio, setProfileI
         </View>
       </View>
 
-      {/* Content for active tab can go here */}
+      {/* Content for active tab */}
       <View style={profileStyles.tabContent}>
         <Text style={{ color: '#666' }}>No content available yet.</Text>
       </View>
 
+      {/* Edit Profile Modal */}
       <EditProfileModal
         visible={showEditModal}
         currentName={userName}
