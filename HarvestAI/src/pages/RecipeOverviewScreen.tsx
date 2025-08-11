@@ -32,6 +32,7 @@ const RecipeOverviewScreen = () => {
 
   const [ratingScore, setRatingScore] = useState<number>(item.spoonacularScore ?? 0);
   const [steps, setSteps] = useState<string[]>([]);
+  const [ingredientsList, setIngredientsList] = useState<string[]>([]);
 
   // keep heart in sync with favorites
   useEffect(() => {
@@ -76,6 +77,19 @@ const RecipeOverviewScreen = () => {
                 .filter((s: string) => s.length > 0)
             : [];
         setSteps(nextSteps);
+
+        const list = Array.isArray(infoData?.extendedIngredients) ? infoData.extendedIngredients : [];
+        const nextIngredients = list
+          .map((ing: any) => {
+            if (ing?.original) {
+              // original is already human-readable; strip any stray HTML just in case
+              return String(ing.original).replace(/<\/?[^>]+(>|$)/g, '').trim();
+            }
+            const parts = [ing?.amount, ing?.unit, ing?.name].filter(Boolean).map(String);
+            return parts.join(' ').trim();
+          })
+          .filter((s: string) => s.length > 0);
+        setIngredientsList(nextIngredients);
       } catch (err) {
         console.error('Failed to fetch recipe details:', err);
       }
@@ -128,6 +142,7 @@ const RecipeOverviewScreen = () => {
         score: ratingScore,
         calories: nutrition?.calories ? String(nutrition.calories) : undefined,
         steps,
+        ingredients: ingredientsList,
       });
       await Clipboard.setStringAsync(text);
       showToast('Recipe copied');
@@ -144,6 +159,7 @@ const RecipeOverviewScreen = () => {
         score: ratingScore,
         calories: nutrition?.calories ? String(nutrition.calories) : undefined,
         steps,
+        ingredients: ingredientsList,
       });
 
       const result = await Share.share(

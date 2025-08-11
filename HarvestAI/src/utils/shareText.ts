@@ -1,30 +1,38 @@
 export const stripHtml = (s?: string) =>
   (s ?? '').replace(/<\/?[^>]+(>|$)/g, '').trim();
 
-export const recipeCopyText = (p: {
+export const recipeCopyText = ({
+  title,
+  score,
+  calories,
+  ingredients,
+  steps,
+}: {
   title: string;
   score?: number;
   calories?: string;
+  ingredients?: string[];
   steps?: string[];
-  url?: string;
 }) => {
-  const stars = typeof p.score === 'number' ? `${Math.round(p.score / 20)}/5` : undefined;
+  const ratingText = score ? `Rating: ${Math.round(score / 20)}/5` : '';
+  const caloriesText = calories ? `Calories: ${calories}` : '';
 
-  const head = [
-    `🍽️ ${p.title}`,
-    stars && `Rating: ${stars}`,
-    p.calories && `Calories: ${p.calories}`,
-  ].filter(Boolean).join('\n');
+  const ingredientsText = ingredients?.length
+    ? `Ingredients:\n${ingredients.map((i) => `• ${i}`).join('\n')}\n`
+    : '';
 
-  if (p.steps?.length) {
-    const lines = p.steps.map((s, i) => `${i + 1}. ${s.replace(/\.$/, '')}.`);
-    return [head, '', 'Preparation:', ...lines, p.url ? `\nLink: ${p.url}` : '']
-      .filter(Boolean)
-      .join('\n');
-  }
+  const stepsText = steps?.length
+    ? `Preparation:\n${steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`
+    : 'No Instructions Found';
 
-  // No steps case
-  return [head, '', 'No Instructions Found', p.url ? `\nLink: ${p.url}` : '']
+  return [
+    `🍽️ ${title}`,
+    ratingText,
+    caloriesText && `${caloriesText}\n`,
+    ingredientsText,
+    stepsText,
+  ]
     .filter(Boolean)
     .join('\n');
 };
+

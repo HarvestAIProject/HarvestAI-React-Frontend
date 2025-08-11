@@ -22,7 +22,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import type { FavoriteItem } from '../types/FavoriteItem';
 import * as Clipboard from 'expo-clipboard';
 import { showToast } from '../utils/toast';
-import { recipeCopyText } from '../utils/shareText';
+import { stripHtml, recipeCopyText } from '../utils/shareText';
 
 const TABS = ['Ingredients', 'Preparation', 'Nutrition'];
 
@@ -40,14 +40,27 @@ const RecipePage = () => {
   const [liked, setLiked] = useState(false);
 
   const prepSteps = useMemo(() => {
-    const raw = info?.instructions ?? '';
-    if (typeof raw !== 'string' || !raw.trim()) return [];
+    const raw = stripHtml(info?.instructions ?? '');
+    if (!raw) return [];
     return raw
-      .replace(/<\/?[^>]+(>|$)/g, '')
       .split('.')
       .map(s => s.trim())
-      .filter(s => s.length > 0);
+      .filter(Boolean);
   }, [info?.instructions]);
+
+  const ingredientsList = useMemo(() => {
+    const list = Array.isArray(info?.extendedIngredients) ? info.extendedIngredients : [];
+    return list
+      .map((ing: any) => {
+        // Prefer Spoonacular's original string if present (already human-friendly)
+        if (ing?.original) return stripHtml(String(ing.original));
+        const parts = [ing?.amount, ing?.unit, ing?.name]
+          .filter(Boolean)
+          .map(String);
+        return parts.join(' ').trim();
+      })
+      .filter((s: string) => s.length > 0);
+  }, [info?.extendedIngredients]);
 
   useEffect(() => {
     setLiked(isFavorite(item.id));
@@ -135,15 +148,14 @@ const RecipePage = () => {
 
   const handleCopy = async () => {
     try {
-      const caloriesNutr = info?.nutrition?.nutrients?.find?.(
-        (n: any) => n?.name === 'Calories'
-      );
+      const caloriesNutr = info?.nutrition?.nutrients?.find?.((n: any) => n?.name === 'Calories');
 
       const text = recipeCopyText({
         title: item.title,
         score: score ?? undefined,
         calories: caloriesNutr?.amount ? String(caloriesNutr.amount) : undefined,
         steps: prepSteps,
+        ingredients: ingredientsList,   // ⬅️ NEW
       });
 
       await Clipboard.setStringAsync(text);
@@ -156,15 +168,14 @@ const RecipePage = () => {
 
   const handleShare = async () => {
     try {
-      const caloriesNutr = info?.nutrition?.nutrients?.find?.(
-        (n: any) => n?.name === 'Calories'
-      );
+      const caloriesNutr = info?.nutrition?.nutrients?.find?.((n: any) => n?.name === 'Calories');
 
       const text = recipeCopyText({
         title: item.title,
         score: score ?? undefined,
         calories: caloriesNutr?.amount ? String(caloriesNutr.amount) : undefined,
         steps: prepSteps,
+        ingredients: ingredientsList,
       });
 
       const result = await Share.share(
@@ -174,10 +185,7 @@ const RecipePage = () => {
           default: { message: text },
         })!
       );
-
-      if (result.action === Share.sharedAction) {
-        showToast('Shared!');
-      }
+      if (result.action === Share.sharedAction) showToast('Shared!');
     } catch (e) {
       showToast('Could not share. Try again.');
       console.error(e);
