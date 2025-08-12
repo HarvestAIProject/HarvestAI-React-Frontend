@@ -16,23 +16,28 @@ const SearchScreen = () => {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const fetchResults = async () => {
-    if (!query.trim()) return;
+  const fetchResults = async (q: string = query) => {
+    const trimmed = q.trim();
+    if (!trimmed) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const data = await searchRecipes(query);
+      const data = await searchRecipes(trimmed);
       setResults(data.results || data);
     } catch (error) {
       console.error('Search failed:', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      fetchResults();
-    }, 500); // debounce
-
+      fetchResults(query);
+    }, 500);
     return () => clearTimeout(delayDebounce);
   }, [query]);
 
@@ -57,7 +62,7 @@ const SearchScreen = () => {
         />
 
         {query.length > 0 && (
-          <TouchableOpacity onPress={() => setQuery('')}>
+          <TouchableOpacity onPress={() => { setQuery(''); setResults([]); }}>
             <FontAwesome name="times-circle" size={18} color="#6b7280" style={{ marginLeft: 8 }} />
           </TouchableOpacity>
         )}

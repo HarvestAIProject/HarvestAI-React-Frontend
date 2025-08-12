@@ -1,28 +1,36 @@
-import { Modal, View, TextInput, TouchableOpacity, Text, Image, Animated, Easing } from 'react-native';
+// EditProfileModal.tsx
+import { Modal, View, TextInput, TouchableOpacity, Text, Image, Animated, Easing, Alert } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import profileStyles from '../styles/profileStyles';
+import { useUser } from '@clerk/clerk-expo';
+import * as FileSystem from 'expo-file-system';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 type EditProfileModalProps = {
   visible: boolean;
   currentName: string;
   currentBio: string;
-  currentImage?: string;
-  onSave: (newName: string, newBio: string, newImage?: string) => void;
   onClose: () => void;
 };
 
-const EditProfileModal = ({ visible, currentName, currentBio, currentImage, onSave, onClose }: EditProfileModalProps) => {
+type FileInfoWithSize = FileSystem.FileInfo & { size?: number };
+
+const EditProfileModal = ({ visible, currentName, currentBio, onClose }: EditProfileModalProps) => {
+  const { user } = useUser();
+
   const [name, setName] = useState(currentName);
   const [bio, setBio] = useState(currentBio);
   const [imageUri, setImageUri] = useState<string | undefined>(undefined);
 
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     setName(currentName);
     setBio(currentBio);
-    setImageUri(currentImage);
-  }, [visible, currentName, currentBio, currentImage]);
+    setImageUri(undefined);
+  }, [visible, currentName, currentBio]);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -35,9 +43,39 @@ const EditProfileModal = ({ visible, currentName, currentBio, currentImage, onSa
         useNativeDriver: true,
       }).start();
     } else {
-      fadeAnim.setValue(0); // reset for next time
+      fadeAnim.setValue(0);
     }
   }, [visible]);
+
+  const MAX_BYTES = 9 * 1024 * 1024;
+
+  async function getSize(uri: string) {
+    const info = (await FileSystem.getInfoAsync(uri, { size: true })) as FileInfoWithSize;
+    return info.size ?? 0;
+  }
+
+  async function compressUnderLimit(uri: string) {
+    let currentUri = uri;
+    let size = await getSize(currentUri);
+
+    let compress = 0.8;
+    let width = 1200;
+
+    while (size > MAX_BYTES && (compress >= 0.3 || width >= 500)) {
+      const result = await ImageManipulator.manipulateAsync(
+        currentUri,
+        [{ resize: { width } }],
+        { compress, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      currentUri = result.uri;
+      size = await getSize(currentUri);
+
+      if (compress > 0.3) compress -= 0.1;
+      else width = Math.floor(width * 0.8);
+    }
+
+    return { uri: currentUri, size };
+  }
 
   const handleChooseImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -47,8 +85,53 @@ const EditProfileModal = ({ visible, currentName, currentBio, currentImage, onSa
       quality: 1,
     });
 
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+    if (result.canceled) return;
+
+    const rawUri = result.assets[0].uri;
+    const { uri: compressedUri, size } = await compressUnderLimit(rawUri);
+
+    if (size > MAX_BYTES) {
+      Alert.alert(
+        'Image too large',
+        'Even after compression the image is still too big. Try a different photo.'
+      );
+      return;
+    }
+
+    setImageUri(compressedUri);
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    try {
+      setSaving(true);
+
+      const current = (user.unsafeMetadata || {}) as Record<string, unknown>;
+      await user.update({
+        unsafeMetadata: {
+          ...current,
+          displayName: name,
+          bio,
+        },
+      });
+
+      if (imageUri) {
+        const file = {
+          uri: imageUri,
+          name: 'avatar.jpg',
+          type: 'image/jpeg',
+        } as any;
+
+        await user.setProfileImage({ file });
+      }
+      await user.reload();
+
+      onClose();
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Save failed', 'Please try again.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -57,7 +140,8 @@ const EditProfileModal = ({ visible, currentName, currentBio, currentImage, onSa
       <Animated.View
         style={[
           profileStyles.modalOverlay,
-          { backgroundColor: fadeAnim.interpolate({
+          {
+            backgroundColor: fadeAnim.interpolate({
               inputRange: [0, 1],
               outputRange: ['rgba(0,0,0,0)', 'rgba(0,0,0,0.5)'],
             }),
@@ -74,7 +158,9 @@ const EditProfileModal = ({ visible, currentName, currentBio, currentImage, onSa
                 source={
                   imageUri
                     ? { uri: imageUri }
-                    : require('../assets/profile-placeholder.png') // fallback
+                    : user?.imageUrl
+                      ? { uri: user.imageUrl }
+                      : require('../assets/profile-placeholder.png')
                 }
                 style={profileStyles.editImage}
               />
@@ -87,12 +173,12 @@ const EditProfileModal = ({ visible, currentName, currentBio, currentImage, onSa
                 onPress={() => setImageUri(undefined)}
                 hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
               >
-                <Ionicons name="close-circle" size={20} color="#e74c3c" />
+                <Ionicons name="close-circle" size={22} color="#e74c3c" />
               </TouchableOpacity>
             )}
           </View>
 
-          {/* Name Input */}
+          {/* Name */}
           <Text style={profileStyles.inputLabel}>Name</Text>
           <TextInput
             style={profileStyles.input}
@@ -101,21 +187,25 @@ const EditProfileModal = ({ visible, currentName, currentBio, currentImage, onSa
             placeholder="Enter new name"
           />
 
-          {/* Bio Input */}
+          {/* Bio */}
           <Text style={[profileStyles.inputLabel, { marginTop: 12 }]}>Bio</Text>
           <TextInput
             style={[profileStyles.input, { height: 80 }]}
             value={bio}
             onChangeText={setBio}
-            placeholder="Enter bio"
+            placeholder="Tell people a little about yourself (max 100 chars)"
             multiline
             maxLength={100}
           />
           <Text style={profileStyles.charCount}>{bio.length}/100</Text>
 
           <View style={profileStyles.buttonRow}>
-            <TouchableOpacity style={profileStyles.saveButton} onPress={() => onSave(name, bio, imageUri)}>
-              <Text style={profileStyles.saveText}>Save</Text>
+            <TouchableOpacity
+              style={[profileStyles.saveButton, saving && { opacity: 0.6 }]}
+              onPress={handleSave}
+              disabled={saving}
+            >
+              <Text style={profileStyles.saveText}>{saving ? 'Saving...' : 'Save'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={profileStyles.cancelButton} onPress={onClose}>
               <Text style={profileStyles.cancelText}>Cancel</Text>

@@ -111,7 +111,7 @@ const recipeOverviewStyles = StyleSheet.create({
     },
     disabledButton: {
       opacity: 0.5,
-      backgroundColor: '#eee',
+      color: '#eee',
     },
     iconLabel: {
       color: '#444',

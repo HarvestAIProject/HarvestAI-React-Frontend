@@ -4,24 +4,30 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import topBarStyles from '../styles/topBarStyles';
+import { useUser } from "@clerk/clerk-expo";
 
 type Props = {
   activeTab: 'Home' | 'Discover' | 'Shop' | 'You';
-  userName: string;
   onFavouritesPress?: () => void;
 };
 
-const TopBar = ({ activeTab, userName, onFavouritesPress }: Props) => {
+type MyMeta = { displayName?: string };
 
-  if (activeTab === 'You') return null;
+const TopBar = ({ activeTab, onFavouritesPress }: Props) => {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const { user } = useUser();
+  if (activeTab === 'You') return null;
+
+  const meta = (user?.unsafeMetadata as MyMeta) || {};
+  const displayName = meta.displayName || user?.fullName || user?.firstName || 'Chef';
 
   return (
     <View style={topBarStyles.container}>
       {activeTab === 'Home' && (
         <View style={topBarStyles.headerRow}>
-          <Text style={topBarStyles.greetingText}>What’s Cooking,{'\n'}{userName}</Text>
+          <Text style={topBarStyles.greetingText}>What’s Cooking,{'\n'}{displayName}</Text>
           <TouchableOpacity style={topBarStyles.heartButton} onPress={onFavouritesPress}>
             <FontAwesome name="heart" size={24} color="white" />
           </TouchableOpacity>
