@@ -40,6 +40,17 @@ const topBarStyles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 8,
   },
+  rightButtons: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  },
+
+  signOutButton: {
+  padding: 8,
+  borderRadius: 20,
+  backgroundColor: 'rgba(255, 107, 107, 0.1)',
+  },
 });
 
 export default topBarStyles;

@@ -1,36 +1,85 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import topBarStyles from '../styles/topBarStyles';
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth } from "../context/AuthContext";
 
 type Props = {
   activeTab: 'Home' | 'Discover' | 'Shop' | 'You';
   onFavouritesPress?: () => void;
 };
 
-type MyMeta = { displayName?: string };
-
 const TopBar = ({ activeTab, onFavouritesPress }: Props) => {
-
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { user, logout } = useAuth();
 
-  const { user } = useUser();
+  // Add debugging
+  console.log('TopBar rendered with user:', user?.email || 'No user');
+
   if (activeTab === 'You') return null;
 
-  const meta = (user?.unsafeMetadata as MyMeta) || {};
-  const displayName = meta.displayName || user?.fullName || user?.firstName || 'Chef';
+  // Extract display name from Firebase user
+  const getDisplayName = () => {
+    if (user?.displayName) return user.displayName;
+    if (user?.email) {
+      // Extract name from email (before @)
+      const emailName = user.email.split('@')[0];
+      return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+    }
+    return 'Chef';
+  };
+
+  const handleSignOut = () => {
+    console.log('Sign out button pressed'); // Add this
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => console.log('Sign out canceled'),
+        },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            console.log('User confirmed sign out'); // Add this
+            try {
+              console.log('Calling logout function...');
+              await logout();
+              console.log('Logout function completed');
+            } catch (error) {
+              console.error('Sign out error:', error);
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const displayName = getDisplayName();
 
   return (
     <View style={topBarStyles.container}>
       {activeTab === 'Home' && (
         <View style={topBarStyles.headerRow}>
-          <Text style={topBarStyles.greetingText}>What’s Cooking,{'\n'}{displayName}</Text>
-          <TouchableOpacity style={topBarStyles.heartButton} onPress={onFavouritesPress}>
-            <FontAwesome name="heart" size={24} color="white" />
-          </TouchableOpacity>
+          <Text style={topBarStyles.greetingText}>What's Cooking,{'\n'}{displayName}</Text>
+          <View style={topBarStyles.rightButtons}>
+            <TouchableOpacity style={topBarStyles.heartButton} onPress={onFavouritesPress}>
+              <FontAwesome name="heart" size={24} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={topBarStyles.signOutButton} 
+              onPress={handleSignOut}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // Make it easier to tap
+            >
+              <FontAwesome name="sign-out" size={20} color="#ff6b6b" />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
 

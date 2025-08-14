@@ -8,22 +8,22 @@ import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 
 import AppNavigator from './src/routes/AppNavigator';
 import { FavoritesProvider } from './src/context/FavoritesContext';
-import { AuthProvider, useAuth } from './src/context/AuthContext';
+//commenting out to try firebase
+// import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
+// import { tokenCache } from './src/auth/clerkTokenCache';
 import LoginScreen from './src/pages/screens/LoginScreen';
 
-function AuthGate() {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator />
-      </View>
-    );
-  }
-  
-  return user ? <AppNavigator /> : <LoginScreen />;
-}
+// function Gate() {
+//   const { isSignedIn, isLoaded } = useAuth();
+//   if (!isLoaded) {
+//     return (
+//       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+//         <ActivityIndicator />
+//       </View>
+//     );
+//   }
+//   return isSignedIn ? <AppNavigator /> : <LoginScreen />;
+// }
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -31,15 +31,17 @@ export default function App() {
     'InriaSerif-Regular': require('./assets/fonts/InriaSerif-Regular.ttf'),
     'InriaSerif-Italic': require('./assets/fonts/InriaSerif-Italic.ttf'),
   });
-  
   if (!fontsLoaded) return null;
+
+  // const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!; 
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
+      {/* <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}> */}
         <FavoritesProvider>
           <NavigationContainer>
-            <AuthGate />
+            {/* <Gate /> */}
+            <LoginScreen />
           </NavigationContainer>
 
           <Toast
@@ -62,7 +64,7 @@ export default function App() {
             }}
           />
         </FavoritesProvider>
-      </AuthProvider>
+      {/* </ClerkProvider> */}
     </GestureHandlerRootView>
   );
 }
