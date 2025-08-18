@@ -14,10 +14,9 @@ type Props = {
 type MyMeta = { displayName?: string };
 
 const TopBar = ({ activeTab, onFavouritesPress }: Props) => {
-
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
   const { user } = useUser();
+
   if (activeTab === 'You') return null;
 
   const meta = (user?.unsafeMetadata as MyMeta) || {};
@@ -27,21 +26,35 @@ const TopBar = ({ activeTab, onFavouritesPress }: Props) => {
     <View style={topBarStyles.container}>
       {activeTab === 'Home' && (
         <View style={topBarStyles.headerRow}>
-          <Text style={topBarStyles.greetingText}>What’s Cooking,{'\n'}{displayName}</Text>
+          <Text style={topBarStyles.greetingText}>
+            What’s Cooking,{'\n'}{displayName}
+          </Text>
           <TouchableOpacity style={topBarStyles.heartButton} onPress={onFavouritesPress}>
             <FontAwesome name="heart" size={24} color="white" />
           </TouchableOpacity>
         </View>
       )}
 
-      <TouchableOpacity
-        style={topBarStyles.searchBar}
-        activeOpacity={1}
-        onPress={() => navigation.navigate('Search')}
-      >
-        <FontAwesome name="search" size={18} color="#6b7280" />
-        <Text style={topBarStyles.searchPlaceholder}>Search recipes</Text>
-      </TouchableOpacity>
+      {activeTab === 'Shop' ? (
+        <View style={topBarStyles.headerRow}>
+          <Text style={topBarStyles.shopTitle}>Shop</Text>
+          <TouchableOpacity
+            style={topBarStyles.cartButton}
+            // onPress={() => navigation.navigate('Cart')}
+          >
+            <FontAwesome name="shopping-cart" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <TouchableOpacity
+          style={topBarStyles.searchBar}
+          activeOpacity={1}
+          onPress={() => navigation.navigate('Search')}
+        >
+          <FontAwesome name="search" size={18} color="#6b7280" />
+          <Text style={topBarStyles.searchPlaceholder}>Search recipes</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

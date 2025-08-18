@@ -13,7 +13,6 @@ const topBarStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
   },
   greetingText: {
     fontSize: 24,
@@ -28,6 +27,7 @@ const topBarStyles = StyleSheet.create({
     shadowRadius: 4,
   },
   searchBar: {
+    marginTop: 5,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#e1e5e4',
@@ -39,6 +39,18 @@ const topBarStyles = StyleSheet.create({
     color: '#6b7280',
     fontSize: 16,
     marginLeft: 8,
+  },
+  shopTitle: {
+    fontSize: 24,
+    fontFamily: 'InriaSerif-Bold',
+    color: 'white',
+  },
+  cartButton: {
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 });
 
