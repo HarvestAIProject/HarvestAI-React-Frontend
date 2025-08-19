@@ -46,6 +46,7 @@ export default function App() {
             </NavigationContainer>
 
             <Toast
+              position='bottom'
               config={{
                 success: (props) => (
                   <BaseToast

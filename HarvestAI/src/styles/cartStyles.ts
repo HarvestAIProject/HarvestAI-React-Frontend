@@ -168,7 +168,7 @@ const cartStyles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: -2 },
     shadowRadius: 6,
-    elevation: 8,
+    minHeight: 200,
   },
   summaryRow: {
     flexDirection: 'row',

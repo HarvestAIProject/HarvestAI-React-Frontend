@@ -168,7 +168,6 @@ const Cart = () => {
             <TouchableOpacity
               style={[cartStyles.checkoutBtn, empty && cartStyles.checkoutBtnDisabled]}
               disabled={empty}
-              activeOpacity={0.85}
             >
               <Text
                 style={[cartStyles.checkoutText, empty && cartStyles.checkoutTextDisabled]}

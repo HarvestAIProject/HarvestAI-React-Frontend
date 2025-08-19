@@ -3,22 +3,23 @@ import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from
 import shopStyles from '../../styles/shopStyles';
 import { Product } from '../../types/Product';
 import { fetchProducts } from '../../api/shopApi';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../types/navigation';
 
 const Shop = () => {
   const [listings, setListings] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     const ac = new AbortController();
     (async () => {
       try {
         setLoading(true);
-        setError(null);
         const items = await fetchProducts();
         if (!ac.signal.aborted) setListings(items);
-      } catch (e: any) {
-        if (!ac.signal.aborted) setError(e?.message ?? 'Failed to load products');
       } finally {
         if (!ac.signal.aborted) setLoading(false);
       }
@@ -27,7 +28,7 @@ const Shop = () => {
   }, []);
 
   const renderCard = ({ item }: { item: Product }) => (
-    <TouchableOpacity style={shopStyles.card}>
+    <TouchableOpacity style={shopStyles.card} onPress={() => navigation.navigate('Product', { product: item })}>
       <Image source={{ uri: item.imageUrl }} style={shopStyles.cardImage} />
       <View style={shopStyles.cardContent}>
         <Text style={shopStyles.cardTitle} numberOfLines={1}>
@@ -43,12 +44,6 @@ const Shop = () => {
       {loading ? (
         <View style={shopStyles.placeholderContainer}>
           <ActivityIndicator size="large" />
-          <Text style={shopStyles.placeholderSubtitle}>Loading listings…</Text>
-        </View>
-      ) : error ? (
-        <View style={shopStyles.placeholderContainer}>
-          <Text style={shopStyles.placeholderTitle}>Error</Text>
-          <Text style={shopStyles.placeholderSubtitle}>{error}</Text>
         </View>
       ) : listings.length === 0 ? (
         <View style={shopStyles.placeholderContainer}>

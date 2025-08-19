@@ -119,7 +119,6 @@ const Discover = () => {
         }
         ListEmptyComponent={
           loadingInitial ? (
-            // Initial load: centered spinner ONLY (no empty text)
             <ActivityIndicator size="large" />
           ) : (
             // Empty state when not loading
@@ -131,7 +130,6 @@ const Discover = () => {
             </View>
           )
         }
-        // Footer spinner ONLY when there are items and we’re paginating
         ListFooterComponent={
           recipes.length > 0 && loadingMore ? <ActivityIndicator size="small" /> : null
         }

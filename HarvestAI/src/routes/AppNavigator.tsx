@@ -10,6 +10,7 @@ import MainLayout from '../layout/MainLayout';
 import SearchScreen from '../pages/SearchScreen';
 import CategoriesScreen from '../pages/CategoriesScreen';
 import CategoriesResultsScreen from '../pages/CategoriesResultsScreen';
+import ProductPage from '../pages/ProductPage';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -24,6 +25,7 @@ const AppNavigator = () => (
     <Stack.Screen name="RecipePage" component={RecipePage} />
     <Stack.Screen name="Categories" component={CategoriesScreen} />
     <Stack.Screen name="CategoriesResults" component={CategoriesResultsScreen} />
+    <Stack.Screen name="Product" component={ProductPage} />
   </Stack.Navigator>
 );
 

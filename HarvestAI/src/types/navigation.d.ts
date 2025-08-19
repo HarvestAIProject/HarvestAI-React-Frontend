@@ -8,4 +8,5 @@ export type RootStackParamList = {
   Search: undefined;
   Categories: undefined;
   CategoriesResults: { results: ResultItem[]; title: string };
+  Product: { product: Product };
 };
