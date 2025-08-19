@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import CameraScreen from '../pages/CameraScreen';
 import Favourites from '../pages/screens/Favourites';
+import Cart from '../pages/screens/Cart';
 import RecipeOverviewScreen from '../pages/RecipeOverviewScreen';
 import RecipePage from '../pages/RecipePage';
 import MainLayout from '../layout/MainLayout';
@@ -18,6 +19,7 @@ const AppNavigator = () => (
     <Stack.Screen name="Search" component={SearchScreen} />
     <Stack.Screen name="Camera" component={CameraScreen} />
     <Stack.Screen name="Favourites" component={Favourites} />
+    <Stack.Screen name="Cart" component={Cart} />
     <Stack.Screen name="RecipeOverview" component={RecipeOverviewScreen} />
     <Stack.Screen name="RecipePage" component={RecipePage} />
     <Stack.Screen name="Categories" component={CategoriesScreen} />

@@ -1,4 +1,4 @@
-import { View, ScrollView } from 'react-native';
+import { View } from 'react-native';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,25 +15,13 @@ import layoutStyles from '../styles/layoutStyles';
 const MainLayout = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [activeTab, setActiveTab] = useState<'Home' | 'Discover' | 'Shop' | 'You'>('Home');
-  const [userName, setUserName] = useState('User');
-  const [bio, setBio] = useState('Lover of noodles, spice & all things nice 🍜');
-  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const renderContent = () => {
     switch (activeTab) {
       case 'Home': return <Home />;
       case 'Discover': return <Discover />;
       case 'Shop': return <Shop />;
-      case 'You': return (
-        <Profile
-          userName={userName}
-          bio={bio}
-          profileImage={profileImage}
-          setUserName={setUserName}
-          setBio={setBio}
-          setProfileImage={setProfileImage}
-        />
-      );
+      case 'You': return <Profile/>;
       default: return null;
     }
   };
@@ -43,8 +31,8 @@ const MainLayout = () => {
       {/* Always show TopBar unless you're navigating away via Stack */}
       <TopBar
         activeTab={activeTab}
-        userName={userName}
         onFavouritesPress={() => navigation.navigate('Favourites')}
+        onCartPress={() => navigation.navigate('Cart')}
       />
 
       {/* Content for the current active tab */}

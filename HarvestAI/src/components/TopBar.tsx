@@ -5,17 +5,20 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import topBarStyles from '../styles/topBarStyles';
 import { useUser } from "@clerk/clerk-expo";
+import { useCart } from '../context/CartContext';
 
 type Props = {
   activeTab: 'Home' | 'Discover' | 'Shop' | 'You';
   onFavouritesPress?: () => void;
+  onCartPress?: () => void;
 };
 
 type MyMeta = { displayName?: string };
 
-const TopBar = ({ activeTab, onFavouritesPress }: Props) => {
+const TopBar = ({ activeTab, onFavouritesPress, onCartPress }: Props) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { user } = useUser();
+  const { totalQuantity } = useCart();
 
   if (activeTab === 'You') return null;
 
@@ -40,7 +43,7 @@ const TopBar = ({ activeTab, onFavouritesPress }: Props) => {
           <Text style={topBarStyles.shopTitle}>Shop</Text>
           <TouchableOpacity
             style={topBarStyles.cartButton}
-            // onPress={() => navigation.navigate('Cart')}
+            onPress={onCartPress}
           >
             <FontAwesome name="shopping-cart" size={24} color="white" />
           </TouchableOpacity>

@@ -37,22 +37,23 @@ const shopStyles = StyleSheet.create({
 
   /** Card */
   card: {
-    width: '48%',            // ~2 cards per row, with small margin between
+    width: '48%',
     backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 12,
-    padding: 10,
-    marginBottom: 16,
-    // shadow
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
   },
   cardImage: {
+    height: 150,
     width: '100%',
-    aspectRatio: 1,         // square thumbnail; change if you prefer 4/3
-    borderRadius: 8,
-    marginBottom: 8,
+  },
+  cardContent: {
+    padding: 12,
   },
   cardTitle: {
     fontSize: 14,

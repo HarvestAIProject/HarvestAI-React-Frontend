@@ -41,8 +41,12 @@ const Favourites = () => {
 
       {favorites.length === 0 ? (
         <View style={favouritesStyles.content}>
+          <MaterialIcons name="heart-broken" size={64} color="#9aa0a6" />
           <Text style={favouritesStyles.placeholderText}>
             Looks like your favourites list is empty!
+          </Text>
+          <Text style={favouritesStyles.placeholderSubtitle}>
+            Save some recipes to see them here.
           </Text>
         </View>
       ) : (

@@ -30,9 +30,15 @@ const favouritesStyles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   placeholderText: {
-    fontSize: 16,
+    fontSize: 18,
     fontStyle: 'italic',
-    color: '#999',
+    color: '#444',
+    textAlign: 'center',
+  },
+  placeholderSubtitle: {
+    marginTop: 6,
+    fontSize: 14,
+    color: '#777',
     textAlign: 'center',
   },
   card: {

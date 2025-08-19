@@ -8,6 +8,7 @@ import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 
 import AppNavigator from './src/routes/AppNavigator';
 import { FavoritesProvider } from './src/context/FavoritesContext';
+import { CartProvider } from './src/context/CartContext';
 
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import { tokenCache } from './src/auth/clerkTokenCache';
@@ -39,29 +40,31 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
         <FavoritesProvider>
-          <NavigationContainer>
-            <Gate />
-          </NavigationContainer>
+          <CartProvider>
+            <NavigationContainer>
+              <Gate />
+            </NavigationContainer>
 
-          <Toast
-            config={{
-              success: (props) => (
-                <BaseToast
-                  {...props}
-                  style={{ borderLeftColor: '#7BA890', backgroundColor: '#333', borderRadius: 20, paddingVertical: 10, minHeight: 60 }}
-                  contentContainerStyle={{ paddingHorizontal: 15 }}
-                  text1Style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}
-                />
-              ),
-              error: (props) => (
-                <ErrorToast
-                  {...props}
-                  style={{ borderLeftColor: '#f44336', backgroundColor: '#333', borderRadius: 20, paddingVertical: 10, minHeight: 60 }}
-                  text1Style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}
-                />
-              ),
-            }}
-          />
+            <Toast
+              config={{
+                success: (props) => (
+                  <BaseToast
+                    {...props}
+                    style={{ borderLeftColor: '#7BA890', backgroundColor: '#333', borderRadius: 20, paddingVertical: 10, minHeight: 60 }}
+                    contentContainerStyle={{ paddingHorizontal: 15 }}
+                    text1Style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}
+                  />
+                ),
+                error: (props) => (
+                  <ErrorToast
+                    {...props}
+                    style={{ borderLeftColor: '#f44336', backgroundColor: '#333', borderRadius: 20, paddingVertical: 10, minHeight: 60 }}
+                    text1Style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}
+                  />
+                ),
+              }}
+            />
+          </CartProvider>
         </FavoritesProvider>
       </ClerkProvider>
     </GestureHandlerRootView>
