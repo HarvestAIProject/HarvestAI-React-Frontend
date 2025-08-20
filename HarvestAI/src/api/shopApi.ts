@@ -26,9 +26,17 @@ const toProduct = (p: RawProduct): Product => {
   };
 };
 
-export const fetchProducts = async (): Promise<Product[]> => {
-  const res = await fetch(`${BASE_URL}/shop/products`);
+export const fetchProducts = async (signal?: AbortSignal): Promise<Product[]> => {
+  const res = await fetch(`${BASE_URL}/shop/products`, { signal });
   if (!res.ok) throw new Error('Failed to fetch products');
+  const data = (await res.json()) as RawProduct[];
+  return data.map(toProduct);
+};
+
+export const searchProducts = async (query: string, signal?: AbortSignal): Promise<Product[]> => {
+  const url = `${BASE_URL}/shop/products?q=${encodeURIComponent(query)}`;
+  const res = await fetch(url, { signal });
+  if (!res.ok) throw new Error('Search failed');
   const data = (await res.json()) as RawProduct[];
   return data.map(toProduct);
 };

@@ -11,16 +11,16 @@ const shopStyles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 12,
   },
   placeholderTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-    textAlign: 'center',
+    marginTop: 12,
+    fontSize: 18,
+    fontFamily: 'InriaSerif-Bold',
+    color: '#444',
   },
   placeholderSubtitle: {
+    marginTop: 6,
     fontSize: 14,
     color: '#777',
     textAlign: 'center',
@@ -28,7 +28,7 @@ const shopStyles = StyleSheet.create({
 
   /** Grid */
   grid: {
-    paddingVertical: 16,
+    paddingVertical: 8,
   },
   row: {
     justifyContent: 'space-between',
@@ -76,6 +76,34 @@ const shopStyles = StyleSheet.create({
   addButtonText: {
     color: '#fff',
     fontWeight: '600',
+  },
+  searchWrap: {
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: '#111',
+  },
+  clearBtn: {
+    paddingHorizontal: 4,
+  },
+  clearBtnText: {
+    fontSize: 22,
+    lineHeight: 22,
+    color: '#6b7280',
   },
 });
 
